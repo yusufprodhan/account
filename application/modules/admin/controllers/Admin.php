@@ -1377,6 +1377,49 @@ class Admin extends MY_Controller
                     $this->session->set_flashdata('error', '<strong>Failed!</strong> Member Add Failed');
                 }
             }
+
+
+            if (isset($_POST['update_member'])) {
+                $inputs = $this->input->post();
+                // echo'<pre>';
+                // print_r($inputs);
+                $configure['upload_path'] = './uploads/';
+                $configure['allowed_types'] = 'gif|jpg|png|jpeg';
+                $configure['encrypt_name'] = false;
+                $this->load->library('upload', $configure);
+                $this->upload->do_upload('picture');
+                $pic_data = $this->upload->data();
+                $update_data = array(
+                    'account_id' => $inputs['account_update_id'],
+                    'truck_no' => (!empty($inputs['truck_no'])) ? json_encode($inputs['truck_no']) : "0",
+                    'member_no' => $inputs['member_no'],
+                    'father_name' => $inputs['father_name'],
+                    'mother_name' => $inputs['mother_name'],
+                    'husband_name' => $inputs['husband_name'],
+                    'nid' => $inputs['nid_no'],
+                    'date_of_birth' => date('Y-m-d', strtotime($inputs['date_birth'])),
+                    'mobile_no' => $inputs['mobile_no'],
+                    'email' => $inputs['email'],
+                    'nominee_name' => $inputs['nominee_name'],
+                    'relation' => $inputs['relation'],
+                    'admission_fees' => $inputs['admission_fees'],
+                    'paid_up_balance' => $inputs['paid_up_balance'],
+                    'dps' => $inputs['dps_group'],
+                    'present_address' => $inputs['present_address'],
+                    'permanent_address' => $inputs['permanent_address'],
+                    'member_type' => $inputs['member_type'],
+                    'picture' => $pic_data['file_name'],
+                    'created_by' => $_SESSION['username'],
+                );
+                // echo'<pre>';
+                // print_r($update_data);die();
+                $result = $this->db->update('member', $update_data, array('member_id'=>$inputs['member_edit_id']));
+                if ($result) {
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Update member successfully');
+                } else {
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Member Update Failed');
+                }
+            }
         }
 
         $data->all_member_account = $this->admin_model->getAllMemberAccount();
@@ -1392,16 +1435,251 @@ class Admin extends MY_Controller
     public function getMemberDataOnEdit()
     {
         if (isset($_POST['member_edit_id'])) {
-            $data->all_member_account = $this->admin_model->getAllMemberAccount();
-            $data->all_truck = $this->admin_model->truckList();
-            $data->member_list = $this->admin_model->memberList();
+            $all_member_account = $this->admin_model->getAllMemberAccount();
+            $all_truck = $this->admin_model->truckList();
+            $member_list = $this->admin_model->memberList();
             $post = $this->input->post();
-            $result = $this->db->get_where('member', array('member_id' => $post['member_edit_id']))->result_array();
-            // print_r($result);
-            if (!empty($result)) {
-                echo '';
+            $update_data = $this->db->select('member.*, ledgers.ledger_name')
+                                    ->from('member')
+                                    ->join('ledgers','ledgers.id = member.account_id')
+                                    ->where('member.member_id',$post['member_edit_id'])
+                                    ->get()->result_array();
+            $truck_id = json_decode($update_data[0]['truck_no']);
+            
+            // echo'<pre>';
+            // print_r($truck_id);
+            if (!empty($truck_id)) {
+                echo '<div class="col-md-6">
+                <div class="form-group">
+                    <label for="account_name">Account No: <span style="color:red;">*</span></label><br>
+                    <input type="hidden" name="member_edit_id" class="form-control" value="'.$update_data[0]['member_id'].'">
+                    <input type="hidden" name="account_update_id" class="form-control" value="'.$update_data[0]['account_id'].'">
+                    <input type="text" id="account_name" name="account_name" class="form-control" readonly value="'.$update_data[0]['ledger_name'].'">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="truck_no">Truck No:</label><br>
+                    <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
+                        <option></option>';
+                        if(isset($all_truck)){
+                            if(!empty($all_truck)){
+                                foreach($all_truck as $truck){
+                                    echo'<option '.(in_array($truck["truck_tbl_id"], $truck_id)? "selected":"").' value="'.$truck["truck_tbl_id"].'">'.$truck["truck_number"].'</option>';
+                                }
+                            }
+                        }
+                    echo'</select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="member_no">Member No: <span style="color:red;">*</span></label><br>
+                    <input type="text" id="member_no" name="member_no" class="form-control" required="required" value="'.$update_data[0]['member_no'].'">  
+                </div>
+            </div>                                
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="father_name">Father Name:</label><br>
+                    <input type="text" id="father_name" name="father_name" class="form-control" value="'.$update_data[0]['father_name'].'">
+                </div>
+            </div>                                
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="mother_name">Mother Name:</label><br>
+                    <input type="text" id="mother_name" name="mother_name" class="form-control" value="'.$update_data[0]['mother_name'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="husband_name">Husband/Wife Name:</label><br>
+                    <input type="text" id="husband_name" name="husband_name" class="form-control" value="'.$update_data[0]['husband_name'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="nid_no">National Id No/Birth No:<span style="color:red;">*</span></label><br>
+                    <input type="text" id="nid_no" name="nid_no" class="form-control" required="required" value="'.$update_data[0]['nid'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="date_birth">Date Of Birth:<span style="color:red;">*</span></label><br>
+                    <input type="text" id="date_birth" name="date_birth" class="form-control dateinput" required="required" value="'.$update_data[0]['date_of_birth'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="mobile_no">Mobile No:<span style="color:red;">*</span></label><br>
+                    <input type="text" id="mobile_no" name="mobile_no" class="form-control" required="required" value="'.$update_data[0]['mobile_no'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="email">Email:</label><br>
+                    <input type="email" id="email" name="email" class="form-control" value="'.$update_data[0]['email'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="nominee_name">Nominee name:</label><br>
+                    <input type="text" id="nominee_name" name="nominee_name" class="form-control" value="'.$update_data[0]['nominee_name'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="relation">Relation:</label><br>
+                    <input type="text" id="relation" name="relation" class="form-control" value="'.$update_data[0]['relation'].'">  
+                </div>
+            </div>                                
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="admission_fees">Admission Frees:</label><br>
+                    <input type="number" id="admission_fees" name="admission_fees" class="form-control" value="'.$update_data[0]['admission_fees'].'">  
+                </div>
+            </div>                                
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="paid_up_balance">Paid Up Balance:</label><br>
+                    <input type="number" id="paid_up_balance" name="paid_up_balance" class="form-control" value="'.$update_data[0]['paid_up_balance'].'">  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="dps_group">DPS Group:</label><br>
+                    <select class="form-control dps_group" id="dps_group" name="dps_group">                                            
+                        <option></option>
+                        <option '.(($update_data[0]['dps'] == "DPS-1")?"selected":"").' value="DPS-1">DPS-1</option>
+                        <option '.(($update_data[0]['dps'] == "DPS-2")?"selected":"").' value="DPS-2">DPS-2</option>
+                    </select>
+                </div>
+            </div>                                
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="present_address">Present Address/Mailing Address:</label><br>
+                    <textarea type="number" id="present_address" name="present_address" class="form-control">'.$update_data[0]['present_address'].'</textarea>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="permanent_address">Permanent Address:</label><br>
+                    <textarea type="number" id="permanent_address" name="permanent_address" class="form-control">'.$update_data[0]['permanent_address'].'</textarea>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="member_type">Member Type:</label><br>
+                    <select class="form-control member_type" id="member_type" name="member_type" > 
+                        <option></option>
+                        <option '.(($update_data[0]['member_type'] == "A")?"selected":"").' value="A">A</option>
+                        <option '.(($update_data[0]['member_type'] == "B")?"selected":"").' value="B">B</option>
+                        <option '.(($update_data[0]['member_type'] == "C")?"selected":"").' value="C">C</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="relation">Picture:</label><br>
+                    <input type="file" id="picture" name="picture" class="form-control" >  
+                </div>
+            </div>
+            <div class="col-md-4">
+                <img class="img-responsive" src="'.base_url()."uploads/".$update_data[0]['picture'].'" style="height:200px;width:200px;">
+            </div>
+            ';
             }
         }
+    }
+    /**
+     * @ member truck entry
+     * @ access public
+     * @ return boolean
+     */
+    public function memberTruckVoucher(){
+        $data = new stdClass();
+        $data->title = 'Member Truck Entry';
+        $data->username = $_SESSION['username'];
+        $this->load->library('form_validation');
+        $config = array(
+            array(
+                'field' => 'true_no',
+                'label' => 'Truck No',
+                'rules' => 'required',
+                'errors' => array(
+                    'required' => 'You must provide %s',
+                ),
+            ),
+        );
+        $this->form_validation->set_rules($config);
+        if ($this->form_validation->run() == true) {
+            if(isset($_POST['save_member_truck'])){
+                $post = $this->input->post();                
+                $member_truck_data = array(
+                    'entry_date'=>date('Y-m-d', strtotime($post['entry_date'])),
+                    'truck_no'=>$post['true_no'],
+                    'amount'=>$post['amount'],
+                    'note'=>$post['note'],
+                    'created_by'=>$_SESSION['username']
+                );
+                // echo'<pre>';
+                // print_r($member_truck_data);
+                $result = $this->db->insert('member_truck_entry', $member_truck_data);
+                if ($result) {
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
+                } else {
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
+                }
+            }
+        }
+        $data->member_truck_entry_number = $this->admin_model->getMemberEntryId();
+        $data->entry_truck_list= $this->admin_model->getMemberEntryTruckList();
+        $data->truck_list= $this->admin_model->getMemberTruckList();
+        $this->template->load('admin/template_dashboard', 'admin/member_truck_entry', $data);
+    }
+    /**
+     * @ member truck entry
+     * @ access public
+     * @ return boolean
+     */
+    public function nonMemberTruckVoucher(){
+        $data = new stdClass();
+        $data->title = 'Non Member Truck Entry';
+        $data->username = $_SESSION['username'];
+        $this->load->library('form_validation');
+        $config = array(
+            array(
+                'field' => 'true_no',
+                'label' => 'Truck No',
+                'rules' => 'required',
+                'errors' => array(
+                    'required' => 'You must provide %s',
+                ),
+            ),
+        );
+        $this->form_validation->set_rules($config);
+        if ($this->form_validation->run() == true) {
+            if(isset($_POST['save_non_member_truck'])){
+                $post = $this->input->post();                
+                $non_member_truck_data = array(
+                    'entry_date'=>date('Y-m-d', strtotime($post['entry_date'])),
+                    'truck_no'=>$post['true_no'],
+                    'amount'=>$post['amount'],
+                    'note'=>$post['note'],
+                    'created_by'=>$_SESSION['username']
+                );
+                // echo'<pre>';
+                // print_r($member_truck_data);
+                $result = $this->db->insert('non_member_truck_entry', $non_member_truck_data);
+                if ($result) {
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
+                } else {
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
+                }
+            }
+        }
+        $data->non_member_truck_entry_number = $this->admin_model->getNonMemberEntryId();
+        $data->non_mem_entry_truck_list= $this->admin_model->getNonMemberEntryTruckList();
+        $this->template->load('admin/template_dashboard', 'admin/non_member_truck_entry', $data);
     }
 
 }

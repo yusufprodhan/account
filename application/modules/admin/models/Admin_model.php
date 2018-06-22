@@ -656,7 +656,7 @@ class Admin_model extends CI_Model {
     /*
      * @ get Last voucher id contra voucher
      * @ asscess public
-     * return object
+     * @ return object
      */
 
     public function getContraVoucherId() {
@@ -664,6 +664,69 @@ class Admin_model extends CI_Model {
         $this->db->from('contra_voucher_entries');
         $result = $this->db->get();
         return $result->num_rows();
+    }
+
+    /*
+     * @ get Last entry id member entry
+     * @ access public
+     * @ return boolean
+     */
+
+    public function getMemberEntryId() {
+        $this->db->select('*');
+        $this->db->from('member_truck_entry');
+        $result = $this->db->get();
+        return $result->num_rows();
+    }
+    /*
+     * @ get Last entry id non member entry
+     * @ access public
+     * @ return boolean
+     */
+
+    public function getNonMemberEntryId() {
+        $this->db->select('*');
+        $this->db->from('non_member_truck_entry');
+        $result = $this->db->get();
+        return $result->num_rows();
+    }
+
+    /*
+     * @ get member truck list
+     * @ access public
+     * @ return object
+     */
+
+    public function getMemberTruckList() {
+        $this->db->select('truck_tbl_id, truck_number');
+        $this->db->from('truck');
+        $this->db->where('truck.truck_type', 'A');
+        $result = $this->db->get();
+        return $result->result_array();
+    }
+
+    /*
+     * @ get member entry truck list
+     * @ access public
+     * @ return object
+     */
+    public function getMemberEntryTruckList() {
+        $this->db->select('member_truck_entry.*, truck.truck_number');
+        $this->db->from('member_truck_entry');
+        $this->db->join('truck','truck.truck_tbl_id = member_truck_entry.truck_no');
+        $result = $this->db->get();
+        return $result->result_array();
+    }
+    /*
+     * @ get non member entry truck list
+     * @ access public
+     * @ return object
+     */
+    public function getNonMemberEntryTruckList() {
+        $this->db->select('*');
+        $this->db->from('non_member_truck_entry');
+        $result = $this->db->get();
+        return $result->result_array();
     }
 
     /*

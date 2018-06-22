@@ -97,6 +97,13 @@
                                                 <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/updateLedger">Update Ledger</a></li>
                                             </ul>
                                         </li>
+<!--                                        <li>
+                                            <a><i class="fa fa-truck"></i>Truck Entry<span class="fa fa-chevron-down"></span></a>
+                                            <ul class="nav child_menu">                                                
+                                                <li><a href="<?//= site_url() . $_SESSION['user_type']; ?>/memberTruckEntry">Member Truck Entry</a></li>
+                                                <li><a href="<?//= site_url() . $_SESSION['user_type']; ?>/nonMemberTruckEntry">Non Member Truck Entry</a></li>
+                                            </ul>
+                                        </li>-->
                                         <li>
                                             <a><i class="fa fa-dollar"></i>Voucher Entry<span class="fa fa-chevron-down"></span></a>
                                             <ul class="nav child_menu">                                                
@@ -350,7 +357,8 @@
             $(document).ready(function () {
 
                 $('.dateinput').datetimepicker({
-                    format: 'DD-MM-YYYY',                    
+                    format: 'DD-MM-YYYY',
+                    defaultDate:new Date(),                    
                 });
 
             });

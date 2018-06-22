@@ -254,149 +254,11 @@
                     <div class="col-md-12">
                         <form class="form-horizontal" action="<?php echo site_url() ?>admin/member" method="post" enctype="multipart/form-data">
                             <div class="row">                                
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="account_name">Account No: <span style="color:red;">*</span></label><br>
-                                        <select class="form-control select2 account_name" name="account_name" id="account_name">
-                                            <option></option>
-                                            <?php if(isset($all_member_account)){?>
-                                                <?php if(!empty($all_member_account)){?>
-                                                    <?php foreach($all_member_account as $member_account){?>
-                                                        <option value="<?php echo $member_account['id']?>"><?php echo $member_account['ledger_name']?></option>
-                                                    <?php }?>
-                                                <?php }?>
-                                            <?php }?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="truck_no">Truck No:</label><br>
-                                        <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
-                                            <option></option>
-                                            <?php if(isset($all_truck)){?>
-                                                <?php if(!empty($all_truck)){?>
-                                                    <?php foreach($all_truck as $truck){?>
-                                                        <option value="<?php echo $truck['truck_tbl_id']?>"><?php echo $truck['truck_number']?></option>
-                                                    <?php }?>
-                                                <?php }?>
-                                            <?php }?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="member_no">Member No: <span style="color:red;">*</span></label><br>
-                                        <input type="text" id="member_no" name="member_no" class="form-control" required="required">  
-                                    </div>
-                                </div>                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="father_name">Father Name:</label><br>
-                                        <input type="text" id="father_name" name="father_name" class="form-control">
-                                    </div>
-                                </div>                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mother_name">Mother Name:</label><br>
-                                        <input type="text" id="mother_name" name="mother_name" class="form-control">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="husband_name">Husband Name:</label><br>
-                                        <input type="text" id="husband_name" name="husband_name" class="form-control">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="nid_no">National Id No/Birth No:<span style="color:red;">*</span></label><br>
-                                        <input type="text" id="nid_no" name="nid_no" class="form-control" required="required">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="date_birth">Date Of Birth:<span style="color:red;">*</span></label><br>
-                                        <input type="text" id="date_birth" name="date_birth" class="form-control dateinput" required="required">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mobile_no">Mobile No:<span style="color:red;">*</span></label><br>
-                                        <input type="text" id="mobile_no" name="mobile_no" class="form-control" required="required">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email">Email:</label><br>
-                                        <input type="email" id="email" name="email" class="form-control">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="nominee_name">Nominee name:</label><br>
-                                        <input type="text" id="nominee_name" name="nominee_name" class="form-control">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="relation">Relation:</label><br>
-                                        <input type="text" id="relation" name="relation" class="form-control">  
-                                    </div>
-                                </div>                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="admission_fees">Admission Frees:</label><br>
-                                        <input type="number" id="admission_fees" name="admission_fees" class="form-control">  
-                                    </div>
-                                </div>                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="paid_up_balance">Paid Up Balance:</label><br>
-                                        <input type="number" id="paid_up_balance" name="paid_up_balance" class="form-control">  
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="dps_group">DPS Group:</label><br>
-                                        <select class="form-control dps_group" id="dps_group" name="dps_group">                                            
-                                            <option></option>
-                                            <option value="DPS-1">DPS-1</option>
-                                            <option value="DPS-2">DPS-2</option>                                            
-                                        </select>
-                                    </div>
-                                </div>                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="present_address">Present Address/Mailing Address:</label><br>
-                                        <textarea type="number" id="present_address" name="present_address" class="form-control"></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="permanent_address">Permanent Address:</label><br>
-                                        <textarea type="number" id="permanent_address" name="permanent_address" class="form-control"></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="member_type">Member Type:</label><br>
-                                        <select class="form-control member_type" id="member_type" name="member_type"> 
-                                            <option></option>
-                                            <option value="A">A</option>
-                                            <option value="B">B</option>
-                                            <option value="C">C</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="relation">Picture:</label><br>
-                                        <input type="file" id="picture" name="picture" class="form-control">  
-                                    </div>
+                                <div id="member_update_data">
+
                                 </div>
                             </div>
-                            <button type="submit" name="add_member" class="btn btn-success pull-right" id="add_member" title="Add Truck">Add Member</button>
+                            <button type="submit" name="update_member" class="btn btn-success pull-right" id="update_member" title="Update Member">Update Member</button>
                         </form>  
                     </div>
                 </div>
@@ -439,9 +301,12 @@
             type: 'post',
             data: { member_edit_id: member_edit_id },
             success: function (data) {
-                console.log(data);
-                //$(document).find('#truck_edit_data').html(data);
-
+                $(document).find('#member_update_data').html(data);
+                $('select').css('width', '100%');
+                $(".truck_no").select2({
+                    placeholder: "Select Account",
+                });              
+                
                 $('.dateinput').datetimepicker({
                     format: 'YYYY-MM-DD',                    
                 });
