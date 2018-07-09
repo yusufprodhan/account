@@ -39,10 +39,9 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Truck Number</th>
+                                    <th>Member</th>
                                     <th>Truck Type</th>
                                     <th>Inclusion Date</th>
-                                    <th>Create By</th>
-                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -53,10 +52,9 @@
 	                                            <tr>
 	                                                <td><?php echo $i;$i++ ?></td>
 	                                                <td><?php echo $truck['truck_number'] ?> </td>
+	                                                <td><?php echo $truck['ledger_name'] ?> </td>
 	                                                <td><?php echo $truck['truck_type'] ?></td>
 	                                                <td><?php echo $truck['inclusion_date'] ?></td>
-	                                                <td><?php echo $truck['created_by'] ?></td>
-	                                                <td><?php echo $truck['status'] ?></td>
 	                                                <td>
 	                                                    <button type="button"  data-toggle="modal" data-target="#editTruck" id="edit_Truck" edit_id="<?=$truck['truck_tbl_id']?>" class="btn btn-sm btn-info"> <i class="fa fa-pencil-square" aria-hidden="true"></i> Edit</button>
 	                                                    <button type="button" onclick="viewSupplier(<?=$truck['truck_tbl_id']?>);" class="btn btn-sm btn-primary"> <i class="fa fa-eye" aria-hidden="true"></i> View</button>
@@ -88,13 +86,26 @@
                     <div class="col-md-12">
                         <form class="form-horizontal" action="<?php echo site_url() ?>admin/addTruck" method="post">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="truck_no">Truck No: <span>*</span></label><br>
                                         <input type="text" id="truck_no" name="truck_no" class="form-control" required="required">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="truck_member">Member: <span>*</span></label><br>
+                                        <select class="form-control" name="truck_member" id="truck_member" required="required">
+                                            <option>Select Member</option>
+                                            <?php if(!empty($member_list)){?>
+                                                <?php foreach($member_list as $m_list){?>
+                                                    <option value="<?php echo $m_list['member_id']; ?>"><?php echo $m_list['ledger_name']; ?></option>
+                                                <?php }?>
+                                            <?php }?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="truck_type">Truck Type: <span>*</span></label><br>
                                         <select class="form-control" name="truck_type" id="truck_type" required="required">
@@ -104,7 +115,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="truck_no">Inclusion Date: <span>*</span></label><br>
                                         <input type="text" id="inclusion_date" name="inclusion_date" class="form-control dateinput" required="required">

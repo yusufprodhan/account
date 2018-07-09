@@ -295,7 +295,7 @@
     //edit member
     $(document).on("click", "#edit_member", function(){
         var member_edit_id = $(this).attr('edit_member');
-        console.log(member_edit_id);
+        // console.log(member_edit_id);
         $.ajax({
             url: "<?= site_url('/admin/getMemberDataOnEdit/'); ?>",
             type: 'post',

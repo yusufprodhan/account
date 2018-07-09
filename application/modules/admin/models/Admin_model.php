@@ -1061,9 +1061,12 @@ class Admin_model extends CI_Model {
      * return object
      */
     public function truckList() {
-        $truck_list = $this->db->select('*')
+        $truck_list = $this->db->select('*, ledgers.ledger_name, member.account_id')
                         ->from('truck')
+                        ->join('member', 'member.member_id = truck.member_id')
+                        ->join('ledgers', 'member.account_id = ledgers.id')
                         ->where('truck.status', 'Active')
+                        ->order_by('truck.truck_tbl_id', 'DESC')
                         ->get()->result_array();
         return $truck_list;
     }
@@ -1094,5 +1097,6 @@ class Admin_model extends CI_Model {
                         ->get()->result_array();
         return $truck_list;
     }
+
 
 }

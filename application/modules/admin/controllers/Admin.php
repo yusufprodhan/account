@@ -769,7 +769,7 @@ class Admin extends MY_Controller
             $all_cheque_number = $this->admin_model->getAllChequeNumberAgnBook($cheque_book_number);
             foreach ($all_cheque_number as $cheque_number) {
                 echo '<option></option>'
-                . '<option value="' . $cheque_number->cheque_number . '">' . $cheque_number->cheque_number . '</option>';
+                    . '<option value="' . $cheque_number->cheque_number . '">' . $cheque_number->cheque_number . '</option>';
             }
         }
     }
@@ -788,7 +788,7 @@ class Admin extends MY_Controller
             print_r($bank_name_on_chequeNumber);
             foreach ($bank_name_on_chequeNumber as $bank_name) {
                 echo '<option></option>'
-                . '<option selected value="' . $bank_name->ledger_id . '">' . $bank_name->ledger_name . '</option>';
+                    . '<option selected value="' . $bank_name->ledger_id . '">' . $bank_name->ledger_name . '</option>';
             }
         }
     }
@@ -1171,6 +1171,13 @@ class Admin extends MY_Controller
                 'errors' => array(
                     'required' => 'You must provide %s',
                 ),
+            ), array(
+                'field' => 'truck_member',
+                'label' => 'Member',
+                'rules' => 'required',
+                'errors' => array(
+                    'required' => 'You must provide %s',
+                ),
             ),
             array(
                 'field' => 'inclusion_date',
@@ -1189,6 +1196,7 @@ class Admin extends MY_Controller
                 $inclusion_date = date('Y-m-d', strtotime($inclusion_date_row));
                 $insert_data = array(
                     'truck_number' => $post['truck_no'],
+                    'member_id' => $post['truck_member'],
                     'truck_type' => $post['truck_type'],
                     'inclusion_date' => $inclusion_date,
                     'created_by' => $_SESSION['username'],
@@ -1203,6 +1211,7 @@ class Admin extends MY_Controller
         }
 
         $data->truck_list = $this->admin_model->truckList();
+        $data->member_list = $this->admin_model->memberList();
         $this->template->load('admin/template_dashboard', 'admin/truck', $data);
     }
 
@@ -1217,16 +1226,30 @@ class Admin extends MY_Controller
             $post = $this->input->post();
             // print_r($post);
             $result = $this->db->get_where('truck', array('truck_tbl_id' => $post['truck_edit_id']))->result_array();
+            $member_list = $this->admin_model->memberList();
 
             if (!empty($result)) {
-                echo '<div class="col-md-4">
+                echo '<div class="col-md-3">
                 <div class="form-group">
                     <label for="truck_no">Truck No: <span>*</span></label><br>
                     <input type="hidden" name="truck_update_id" value="' . $result[0]['truck_tbl_id'] . '">
                     <input type="text" id="truck_no" name="truck_no" class="form-control" required="required" value="' . $result[0]['truck_number'] . '">
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="truck_member">Member: <span>*</span></label><br>
+                    <select class="form-control" name="truck_member" id="truck_member" required="required">
+                        <option>Select Member</option>';
+                        if(!empty($member_list)){
+                            foreach($member_list as $m_list){
+                               echo '<option '.(($result[0]["member_id"] == $m_list["member_id"]? "Selected":"")).' value="'.$m_list["member_id"].'">'.$m_list["ledger_name"].'</option>';
+                            }
+                        }
+                    echo'</select>
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="form-group">
                     <label for="truck_type">Truck Type: <span>*</span></label><br>
                     <select class="form-control" name="truck_type" id="truck_type" required="required">
@@ -1236,7 +1259,7 @@ class Admin extends MY_Controller
                     </select>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label for="truck_no">Inclusion Date: <span>*</span></label><br>
                     <input type="text" id="inclusion_date" name="inclusion_date" class="form-control dateinput" required="required" value="' . $result[0]['inclusion_date'] . '">
@@ -1265,7 +1288,7 @@ class Admin extends MY_Controller
             array(
                 'field' => 'truck_no',
                 'label' => 'Truck No',
-                'rules' => 'required',
+                'rules' => 'requiget_truck_typered',
                 'errors' => array(
                     'required' => 'You must provide %s',
                 ),
@@ -1273,6 +1296,14 @@ class Admin extends MY_Controller
             array(
                 'field' => 'truck_type',
                 'label' => 'Truck Type',
+                'rules' => 'required',
+                'errors' => array(
+                    'required' => 'You must provide %s',
+                ),
+            ),
+            array(
+                'field' => 'truck_member',
+                'label' => 'Member',
                 'rules' => 'required',
                 'errors' => array(
                     'required' => 'You must provide %s',
@@ -1297,6 +1328,7 @@ class Admin extends MY_Controller
                 $inclusion_date = date('Y-m-d', strtotime($inclusion_date_row));
                 $update_data = array(
                     'truck_number' => $post['truck_no'],
+                    'member_id' => $post['truck_member'],
                     'truck_type' => $post['truck_type'],
                     'inclusion_date' => $inclusion_date,
                     'created_by' => $_SESSION['username'],
@@ -1413,7 +1445,7 @@ class Admin extends MY_Controller
                 );
                 // echo'<pre>';
                 // print_r($update_data);die();
-                $result = $this->db->update('member', $update_data, array('member_id'=>$inputs['member_edit_id']));
+                $result = $this->db->update('member', $update_data, array('member_id' => $inputs['member_edit_id']));
                 if ($result) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Update member successfully');
                 } else {
@@ -1427,6 +1459,7 @@ class Admin extends MY_Controller
         $data->member_list = $this->admin_model->memberList();
         $this->template->load('admin/template_dashboard', 'admin/member', $data);
     }
+
     /**
      * @ get member data for edit
      * @ access public
@@ -1440,21 +1473,21 @@ class Admin extends MY_Controller
             $member_list = $this->admin_model->memberList();
             $post = $this->input->post();
             $update_data = $this->db->select('member.*, ledgers.ledger_name')
-                                    ->from('member')
-                                    ->join('ledgers','ledgers.id = member.account_id')
-                                    ->where('member.member_id',$post['member_edit_id'])
-                                    ->get()->result_array();
+                ->from('member')
+                ->join('ledgers', 'ledgers.id = member.account_id')
+                ->where('member.member_id', $post['member_edit_id'])
+                ->get()->result_array();
             $truck_id = json_decode($update_data[0]['truck_no']);
-            
+
             // echo'<pre>';
             // print_r($truck_id);
             if (!empty($truck_id)) {
                 echo '<div class="col-md-6">
                 <div class="form-group">
                     <label for="account_name">Account No: <span style="color:red;">*</span></label><br>
-                    <input type="hidden" name="member_edit_id" class="form-control" value="'.$update_data[0]['member_id'].'">
-                    <input type="hidden" name="account_update_id" class="form-control" value="'.$update_data[0]['account_id'].'">
-                    <input type="text" id="account_name" name="account_name" class="form-control" readonly value="'.$update_data[0]['ledger_name'].'">
+                    <input type="hidden" name="member_edit_id" class="form-control" value="' . $update_data[0]['member_id'] . '">
+                    <input type="hidden" name="account_update_id" class="form-control" value="' . $update_data[0]['account_id'] . '">
+                    <input type="text" id="account_name" name="account_name" class="form-control" readonly value="' . $update_data[0]['ledger_name'] . '">
                 </div>
             </div>
             <div class="col-md-6">
@@ -1462,86 +1495,86 @@ class Admin extends MY_Controller
                     <label for="truck_no">Truck No:</label><br>
                     <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
                         <option></option>';
-                        if(isset($all_truck)){
-                            if(!empty($all_truck)){
-                                foreach($all_truck as $truck){
-                                    echo'<option '.(in_array($truck["truck_tbl_id"], $truck_id)? "selected":"").' value="'.$truck["truck_tbl_id"].'">'.$truck["truck_number"].'</option>';
-                                }
-                            }
+                if (isset($all_truck)) {
+                    if (!empty($all_truck)) {
+                        foreach ($all_truck as $truck) {
+                            echo '<option ' . (in_array($truck["truck_tbl_id"], $truck_id) ? "selected" : "") . ' value="' . $truck["truck_tbl_id"] . '">' . $truck["truck_number"] . '</option>';
                         }
-                    echo'</select>
+                    }
+                }
+                echo '</select>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="member_no">Member No: <span style="color:red;">*</span></label><br>
-                    <input type="text" id="member_no" name="member_no" class="form-control" required="required" value="'.$update_data[0]['member_no'].'">  
+                    <input type="text" id="member_no" name="member_no" class="form-control" required="required" value="' . $update_data[0]['member_no'] . '">  
                 </div>
             </div>                                
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="father_name">Father Name:</label><br>
-                    <input type="text" id="father_name" name="father_name" class="form-control" value="'.$update_data[0]['father_name'].'">
+                    <input type="text" id="father_name" name="father_name" class="form-control" value="' . $update_data[0]['father_name'] . '">
                 </div>
             </div>                                
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="mother_name">Mother Name:</label><br>
-                    <input type="text" id="mother_name" name="mother_name" class="form-control" value="'.$update_data[0]['mother_name'].'">  
+                    <input type="text" id="mother_name" name="mother_name" class="form-control" value="' . $update_data[0]['mother_name'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="husband_name">Husband/Wife Name:</label><br>
-                    <input type="text" id="husband_name" name="husband_name" class="form-control" value="'.$update_data[0]['husband_name'].'">  
+                    <input type="text" id="husband_name" name="husband_name" class="form-control" value="' . $update_data[0]['husband_name'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="nid_no">National Id No/Birth No:<span style="color:red;">*</span></label><br>
-                    <input type="text" id="nid_no" name="nid_no" class="form-control" required="required" value="'.$update_data[0]['nid'].'">  
+                    <input type="text" id="nid_no" name="nid_no" class="form-control" required="required" value="' . $update_data[0]['nid'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="date_birth">Date Of Birth:<span style="color:red;">*</span></label><br>
-                    <input type="text" id="date_birth" name="date_birth" class="form-control dateinput" required="required" value="'.$update_data[0]['date_of_birth'].'">  
+                    <input type="text" id="date_birth" name="date_birth" class="form-control dateinput" required="required" value="' . $update_data[0]['date_of_birth'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="mobile_no">Mobile No:<span style="color:red;">*</span></label><br>
-                    <input type="text" id="mobile_no" name="mobile_no" class="form-control" required="required" value="'.$update_data[0]['mobile_no'].'">  
+                    <input type="text" id="mobile_no" name="mobile_no" class="form-control" required="required" value="' . $update_data[0]['mobile_no'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="email">Email:</label><br>
-                    <input type="email" id="email" name="email" class="form-control" value="'.$update_data[0]['email'].'">  
+                    <input type="email" id="email" name="email" class="form-control" value="' . $update_data[0]['email'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="nominee_name">Nominee name:</label><br>
-                    <input type="text" id="nominee_name" name="nominee_name" class="form-control" value="'.$update_data[0]['nominee_name'].'">  
+                    <input type="text" id="nominee_name" name="nominee_name" class="form-control" value="' . $update_data[0]['nominee_name'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="relation">Relation:</label><br>
-                    <input type="text" id="relation" name="relation" class="form-control" value="'.$update_data[0]['relation'].'">  
+                    <input type="text" id="relation" name="relation" class="form-control" value="' . $update_data[0]['relation'] . '">  
                 </div>
             </div>                                
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="admission_fees">Admission Frees:</label><br>
-                    <input type="number" id="admission_fees" name="admission_fees" class="form-control" value="'.$update_data[0]['admission_fees'].'">  
+                    <input type="number" id="admission_fees" name="admission_fees" class="form-control" value="' . $update_data[0]['admission_fees'] . '">  
                 </div>
             </div>                                
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="paid_up_balance">Paid Up Balance:</label><br>
-                    <input type="number" id="paid_up_balance" name="paid_up_balance" class="form-control" value="'.$update_data[0]['paid_up_balance'].'">  
+                    <input type="number" id="paid_up_balance" name="paid_up_balance" class="form-control" value="' . $update_data[0]['paid_up_balance'] . '">  
                 </div>
             </div>
             <div class="col-md-4">
@@ -1549,21 +1582,21 @@ class Admin extends MY_Controller
                     <label for="dps_group">DPS Group:</label><br>
                     <select class="form-control dps_group" id="dps_group" name="dps_group">                                            
                         <option></option>
-                        <option '.(($update_data[0]['dps'] == "DPS-1")?"selected":"").' value="DPS-1">DPS-1</option>
-                        <option '.(($update_data[0]['dps'] == "DPS-2")?"selected":"").' value="DPS-2">DPS-2</option>
+                        <option ' . (($update_data[0]['dps'] == "DPS-1") ? "selected" : "") . ' value="DPS-1">DPS-1</option>
+                        <option ' . (($update_data[0]['dps'] == "DPS-2") ? "selected" : "") . ' value="DPS-2">DPS-2</option>
                     </select>
                 </div>
             </div>                                
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="present_address">Present Address/Mailing Address:</label><br>
-                    <textarea type="number" id="present_address" name="present_address" class="form-control">'.$update_data[0]['present_address'].'</textarea>
+                    <textarea type="number" id="present_address" name="present_address" class="form-control">' . $update_data[0]['present_address'] . '</textarea>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="permanent_address">Permanent Address:</label><br>
-                    <textarea type="number" id="permanent_address" name="permanent_address" class="form-control">'.$update_data[0]['permanent_address'].'</textarea>
+                    <textarea type="number" id="permanent_address" name="permanent_address" class="form-control">' . $update_data[0]['permanent_address'] . '</textarea>
                 </div>
             </div>
             <div class="col-md-4">
@@ -1571,9 +1604,9 @@ class Admin extends MY_Controller
                     <label for="member_type">Member Type:</label><br>
                     <select class="form-control member_type" id="member_type" name="member_type" > 
                         <option></option>
-                        <option '.(($update_data[0]['member_type'] == "A")?"selected":"").' value="A">A</option>
-                        <option '.(($update_data[0]['member_type'] == "B")?"selected":"").' value="B">B</option>
-                        <option '.(($update_data[0]['member_type'] == "C")?"selected":"").' value="C">C</option>
+                        <option ' . (($update_data[0]['member_type'] == "A") ? "selected" : "") . ' value="A">A</option>
+                        <option ' . (($update_data[0]['member_type'] == "B") ? "selected" : "") . ' value="B">B</option>
+                        <option ' . (($update_data[0]['member_type'] == "C") ? "selected" : "") . ' value="C">C</option>
                     </select>
                 </div>
             </div>
@@ -1584,64 +1617,111 @@ class Admin extends MY_Controller
                 </div>
             </div>
             <div class="col-md-4">
-                <img class="img-responsive" src="'.base_url()."uploads/".$update_data[0]['picture'].'" style="height:200px;width:200px;">
+                <img class="img-responsive" src="' . base_url() . "uploads/" . $update_data[0]['picture'] . '" style="height:200px;width:200px;">
             </div>
             ';
             }
         }
     }
+
     /**
      * @ member truck entry
      * @ access public
      * @ return boolean
      */
-    public function memberTruckVoucher(){
+    public function memberTruckVoucher()
+    {
         $data = new stdClass();
         $data->title = 'Member Truck Entry';
         $data->username = $_SESSION['username'];
-        $this->load->library('form_validation');
-        $config = array(
-            array(
-                'field' => 'true_no',
-                'label' => 'Truck No',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'You must provide %s',
-                ),
-            ),
-        );
-        $this->form_validation->set_rules($config);
-        if ($this->form_validation->run() == true) {
-            if(isset($_POST['save_member_truck'])){
-                $post = $this->input->post();                
-                $member_truck_data = array(
-                    'entry_date'=>date('Y-m-d', strtotime($post['entry_date'])),
-                    'truck_no'=>$post['true_no'],
-                    'amount'=>$post['amount'],
-                    'note'=>$post['note'],
-                    'created_by'=>$_SESSION['username']
-                );
-                // echo'<pre>';
-                // print_r($member_truck_data);
-                $result = $this->db->insert('member_truck_entry', $member_truck_data);
-                if ($result) {
-                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
-                } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
-                }
-            }
+
+//        $this->load->library('form_validation');
+//        $config = array(
+//            array(
+//                'field' => 'truck_no',
+//                'label' => 'Truck No',
+//                'rules' => 'required',
+//                'errors' => array(
+//                    'required' => 'You must provide %s',
+//                ),
+//            ),
+//        );
+//        $this->form_validation->set_rules($config);
+//        if ($this->form_validation->run() == true) {
+//
+//        }
+        if (isset($_POST['save_member_voucher'])) {
+            $post = $this->input->post();
+            echo'<pre>';
+            print_r($post);
+            $member_truck_data = array(
+                'entry_date' => date('Y-m-d', strtotime($post['entry_date'])),
+                'truck_no' => $post['truck_no'],
+                'amount' => $post['amount'],
+                'note' => $post['note'],
+                'created_by' => $_SESSION['username']
+            );
+            // echo'<pre>';
+            // print_r($memaddTruckber_truck_data);
+//                $result = $this->db->insert('member_truck_entry', $member_truck_data);
+//                if ($result) {
+//                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
+//                } else {
+//                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
+//                }
         }
         $data->member_truck_entry_number = $this->admin_model->getMemberEntryId();
-        $data->entry_truck_list= $this->admin_model->getMemberEntryTruckList();
-        $data->truck_list= $this->admin_model->getMemberTruckList();
+        $data->entry_truck_list = $this->admin_model->getMemberEntryTruckList();
+        $data->truck_list = $this->admin_model->getMemberTruckList();
         $this->template->load('admin/template_dashboard', 'admin/member_truck_entry', $data);
     }
+
+    /**
+     * @ get truck type
+     * @ access public
+     * @ return object
+     */
+    public function get_truck_type()
+    {
+        if (isset($_POST['truck_number'])) {
+            $post = $this->input->post('truck_number');
+            $truck_type = $this->db->query("SELECT
+                                                truck.truck_type, member.account_id, ledgers.ledger_name
+                                            FROM
+                                                truck
+                                            JOIN member ON member.member_id = truck.member_id
+                                            JOIN ledgers ON member.account_id = ledgers.id
+                                            WHERE
+                                                truck_number LIKE '%$post%'")->result_array();
+//            echo $this->db->last_query();
+//            echo '<pre>';
+            if(!empty($truck_type)){
+                $type = $truck_type[0]['truck_type'];
+                $truck_amount = 0;
+                if($type == 'A'){
+                    $truck_amount = 100;
+                }else{
+                    $truck_amount = 150;
+                }
+                echo '<div class="form-group">
+                        <div class="row">
+                            <label for="amount" class="col-sm-3 col-form-label">Amount</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="amount" name="amount" class="form-control" value="'.$truck_amount.'" truck_member="'.$truck_type[0]["ledger_name"].'">
+                            </div>
+                        </div>
+                    </div>';
+            }
+        }
+    }
+
     /**
      * @ member truck entry
      * @ access public
      * @ return boolean
      */
-    public function nonMemberTruckVoucher(){
+    public function nonMemberTruckVoucher()
+    {
         $data = new stdClass();
         $data->title = 'Non Member Truck Entry';
         $data->username = $_SESSION['username'];
@@ -1658,14 +1738,14 @@ class Admin extends MY_Controller
         );
         $this->form_validation->set_rules($config);
         if ($this->form_validation->run() == true) {
-            if(isset($_POST['save_non_member_truck'])){
-                $post = $this->input->post();                
+            if (isset($_POST['save_non_member_truck'])) {
+                $post = $this->input->post();
                 $non_member_truck_data = array(
-                    'entry_date'=>date('Y-m-d', strtotime($post['entry_date'])),
-                    'truck_no'=>$post['true_no'],
-                    'amount'=>$post['amount'],
-                    'note'=>$post['note'],
-                    'created_by'=>$_SESSION['username']
+                    'entry_date' => date('Y-m-d', strtotime($post['entry_date'])),
+                    'truck_no' => $post['true_no'],
+                    'amount' => $post['amount'],
+                    'note' => $post['note'],
+                    'created_by' => $_SESSION['username']
                 );
                 // echo'<pre>';
                 // print_r($member_truck_data);
@@ -1678,7 +1758,7 @@ class Admin extends MY_Controller
             }
         }
         $data->non_member_truck_entry_number = $this->admin_model->getNonMemberEntryId();
-        $data->non_mem_entry_truck_list= $this->admin_model->getNonMemberEntryTruckList();
+        $data->non_mem_entry_truck_list = $this->admin_model->getNonMemberEntryTruckList();
         $this->template->load('admin/template_dashboard', 'admin/non_member_truck_entry', $data);
     }
 

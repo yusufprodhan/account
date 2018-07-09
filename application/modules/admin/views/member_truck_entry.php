@@ -39,7 +39,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <form class="form-horizontal" action="<?php echo site_url() ?>admin/memberTruckEntry" method="post">
+                <form class="form-horizontal" action="<?php echo site_url() ?>admin/memberTruckVoucher" method="post">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row">
@@ -54,9 +54,10 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
-                                            <label for="truk_no" class="col-sm-3 col-form-label">Truck No</label>
+                                            <label for="truck_no" class="col-sm-3 col-form-label">Truck No</label>
                                             <div class="col-sm-9">
-                                                <select class="form-control select2" name="truk_no" id="truk_no" require>
+                                                <select class="form-control select2" id="truck_no" require>
+                                                    <option>Select Truck</option>
                                                     <?php if (isset($truck_list)) { ?>
                                                         <?php if (!empty($truck_list)) { ?>
                                                             <?php foreach ($truck_list as $truck) { ?>
@@ -65,22 +66,17 @@
                                                         <?php } ?>
                                                     <?php } ?>
                                                 </select>
-                                                <?php if (form_error('true_no')) { ?>
-                                                    <span class="help-block">
-                                                        <strong><?= form_error('true_no') ?></strong>
-                                                    </span>
-                                                <?php } ?>
+<!--                                                --><?php //if (form_error('truck_no')) { ?>
+<!--                                                    <span class="help-block">-->
+<!--                                                        <strong>--><?//= form_error('truck_no') ?><!--</strong>-->
+<!--                                                    </span>-->
+<!--                                                --><?php //} ?>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <label for="amount" class="col-sm-3 col-form-label">Amount</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" id="amount" name="amount" class="form-control" value="50">
-                                            </div>
-                                        </div>
-                                    </div>                                    
+                                    <div class="truck_amount">
+
+                                    </div>
                                 </div>                                
                             </div>
                         </div>                        
@@ -88,42 +84,44 @@
                             <button type="button" id="add_member_truck" class="btn btn-success pull-right">Add</button>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="x_content">
-                <div class="row">
-                    <div class="col-md-6 col-sm-12"> 
-                        <table class="table table-striped table-bordered" id="member_trucl_tbl">
-                            <thead>
-                                <tr>                                    
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <table class="table table-striped table-bordered" id="member_trucl_tbl">
+                                <thead>
+                                <tr>
                                     <th>Truck No</th>
-                                    <th>Amount</th>                        
-                                    <th>Entry Date</th>                        
-                                    <th>Action</th>                                    
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Entry Date</th>
+                                    <th>Action</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
 
-                            </tbody>
-                        </table>
-                        <div class="form-group">
-                            <div class="row">
-                                <label for="narration" class="col-sm-3 col-form-label">Total Amount</label>
-                                <div class="col-sm-9">
-                                    <input type="text" readonly id="total_amount" name="total_amount" class="form-control">
+                                </tbody>
+                            </table>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="narration" class="col-sm-3 col-form-label">Total Amount</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" readonly id="total_amount" name="total_amount" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="narration" class="col-sm-3 col-form-label">Narration</label>
+                                    <div class="col-sm-9">
+                                        <textarea id="note" name="note" class="form-control"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label for="narration" class="col-sm-3 col-form-label">Narration</label>
-                                <div class="col-sm-9">
-                                    <textarea id="note" name="note" class="form-control"></textarea>
-                                </div>
-                            </div>
+                        <div class="col-md-3 pull-right">
+                            <button type="submit" name="save_member_voucher" class="form-control btn btn-primary save_member_voucher">Save Member Voucher</button>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -156,14 +154,18 @@
         $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});       
         
     });
+    $(document).find('.save_member_voucher').hide();
 
     // add truck
     $(document).on("click", "#add_member_truck", function () {
+        $(document).find('.save_member_voucher').show();
         var e_date = $(document).find('#entry_date').val();
-        var truck_number = $(document).find('#truk_no option:selected').attr('truck_num');
+        var truck_number = $(document).find('#truck_no option:selected').attr('truck_num');
+        var truck_member = $(document).find('.truck_amount #amount').attr('truck_member');
         var amount = $(document).find('#amount').val();
         var html = '<tr>' +
                 '<td><input type="text" class="form-control" readonly name="truck_no[]" value="' + truck_number + '" ></td>' +
+                '<td><input type="text" class="form-control" readonly name="truck_member[]" value="' + truck_member + '" ></td>' +
                 '<td><input type="text" class="form-control amount" readonly name="amount[]" value="' + amount + '" ></td>' +
                 '<td><input type="text" class="form-control" readonly name="e_date[]" value="' + e_date + '" ></td>' +
                 '<td><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" title="Delete"></a></td>' +
@@ -182,5 +184,22 @@
         });
         $("#total_amount").val(Math.round(total));
     }
+    
+    // truck type
+    $(document).on('change', '', function () {
+        $(document).find('.save_member_voucher').hide();
+        var truck_number = $('option:selected', this).attr('truck_num');
+        // console.log(truck_number);
+        $.ajax({
+            url: "<?= site_url('/admin/get_truck_type/'); ?>",
+            type: 'post',
+            data: { truck_number: truck_number },
+            success: function (data) {
+                $(document).find('.truck_amount').html(data);
+                //console.log(data);
+            }
+        });
+
+    });
 
 </script>
