@@ -6,15 +6,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Admin model
  *
  */
-class Admin_model extends CI_Model {
+class Admin_model extends CI_Model
+{
 
     /**
      * __construct function.
-     * 
+     *
      * @access public
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
 
         parent::__construct();
         $this->load->database();
@@ -22,13 +24,14 @@ class Admin_model extends CI_Model {
 
     /**
      * get_profile_image method
-     * 
+     *
      * select the existing image file from database
      * @access public
      * @param int $user_id
      * @param string $key - value of the meta_key
      */
-    public function get_profile_image($user_id) {
+    public function get_profile_image($user_id)
+    {
         $this->db->select('value');
         $this->db->from('user_meta');
         $this->db->where('key', 'profile_image');
@@ -49,7 +52,8 @@ class Admin_model extends CI_Model {
      * @return void  
      */
 
-    public function get_all_base_chart() {
+    public function get_all_base_chart()
+    {
         $this->db->select('*');
         $this->db->from('groups');
         $this->db->where('parent_id = 0');
@@ -67,7 +71,8 @@ class Admin_model extends CI_Model {
      * @param int $user_id
      * @return associative array
      */
-    public function get_profile_meta($user_id) {
+    public function get_profile_meta($user_id)
+    {
         $this->db->select('*');
         $this->db->from('user_meta');
         $this->db->where('user_id', $user_id);
@@ -79,9 +84,10 @@ class Admin_model extends CI_Model {
      *
      * @access public
      * @param int $user_id
-     * @return string 
+     * @return string
      */
-    public function get_user_mail($user_id) {
+    public function get_user_mail($user_id)
+    {
         // get user mail
         $this->db->select('email');
         $this->db->from('users');
@@ -92,14 +98,15 @@ class Admin_model extends CI_Model {
 
     /**
      * update_profile data function
-     * 
+     *
      * update user profile data if the key already exist in the user_meta table
      * @access public
      * @param associative array $values
      * @param int $user_id
      * @return bool
      */
-    public function update_profile($data, $user_id) {
+    public function update_profile($data, $user_id)
+    {
         // update the user data 
         foreach ($data as $key => $value) {
             if ($this->get_user_meta_value($user_id, $key) == null) {
@@ -136,7 +143,8 @@ class Admin_model extends CI_Model {
      * @param array $upload_data
      * @return bool
      */
-    public function insert_profile_image($user_id, $upload_data) {
+    public function insert_profile_image($user_id, $upload_data)
+    {
         // profile picture meta key is profile_image
         $key = 'profile_image';
         if ($this->get_user_meta_value($user_id, $key) == null) {
@@ -158,7 +166,8 @@ class Admin_model extends CI_Model {
         }
     }
 
-    public function get_user_meta_value($user_id, $key) {
+    public function get_user_meta_value($user_id, $key)
+    {
         $this->db->select('*');
         $this->db->from('user_meta');
         $this->db->where('key', $key);
@@ -174,7 +183,8 @@ class Admin_model extends CI_Model {
      * @param int $email
      * @return object
      */
-    public function check_existing_email($email) {
+    public function check_existing_email($email)
+    {
         $this->db->select('*');
         $this->db->from('users');
         $this->db->where('email', $email);
@@ -186,7 +196,8 @@ class Admin_model extends CI_Model {
      * @Get all parents
      * @return object
      * */
-    public function getAllAssetsParents() {
+    public function getAllAssetsParents()
+    {
         $parent = $this->db->get_where('groups', array('root_parent_id' => 10));
         return $parent->result();
     }
@@ -196,7 +207,8 @@ class Admin_model extends CI_Model {
      * @Get all Assets Sub Child
      * @return object
      * */
-    public function getAllAssetsSubChild() {
+    public function getAllAssetsSubChild()
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => 1));
         return $parent->result();
     }
@@ -206,7 +218,8 @@ class Admin_model extends CI_Model {
      * @Get all Assets Sub Child under sub
      * @return object
      * */
-    public function getAllAssetsSubChildUnderSub($sub_child_id_value) {
+    public function getAllAssetsSubChildUnderSub($sub_child_id_value)
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => $sub_child_id_value));
         return $parent->result();
     }
@@ -216,7 +229,8 @@ class Admin_model extends CI_Model {
      * @Get all parents
      * @return object
      * */
-    public function getAllExpensesParents() {
+    public function getAllExpensesParents()
+    {
         $parent = $this->db->get_where('groups', array('root_parent_id' => 20));
         return $parent->result();
     }
@@ -226,7 +240,8 @@ class Admin_model extends CI_Model {
      * @Get all Expense Sub Child
      * @return object
      * */
-    public function getAllExpenseSubChild() {
+    public function getAllExpenseSubChild()
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => 2));
         return $parent->result();
     }
@@ -236,7 +251,8 @@ class Admin_model extends CI_Model {
      * @Get all Expense Sub Child under sub
      * @return object
      * */
-    public function getAllexpenseSubChildUnderSub($expense_sub_child_id_value) {
+    public function getAllexpenseSubChildUnderSub($expense_sub_child_id_value)
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => $expense_sub_child_id_value));
         return $parent->result();
     }
@@ -246,7 +262,8 @@ class Admin_model extends CI_Model {
      * @Get all parents
      * @return object
      * */
-    public function getAllIncomeParents() {
+    public function getAllIncomeParents()
+    {
         $parent = $this->db->get_where('groups', array('root_parent_id' => 30));
         return $parent->result();
     }
@@ -256,7 +273,8 @@ class Admin_model extends CI_Model {
      * @Get all Income Sub Child
      * @return object
      * */
-    public function getAllIncomesSubChild() {
+    public function getAllIncomesSubChild()
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => 3));
         return $parent->result();
     }
@@ -266,7 +284,8 @@ class Admin_model extends CI_Model {
      * @Get all Income Sub Child under sub
      * @return object
      * */
-    public function getAllIncomesSubChildUnderSub($incomes_sub_child_id_value) {
+    public function getAllIncomesSubChildUnderSub($incomes_sub_child_id_value)
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => $incomes_sub_child_id_value));
         return $parent->result();
     }
@@ -276,7 +295,8 @@ class Admin_model extends CI_Model {
      * @Get all parents
      * @return object
      * */
-    public function getAllLiabilitiesParents() {
+    public function getAllLiabilitiesParents()
+    {
         $parent = $this->db->get_where('groups', array('root_parent_id' => 40));
         return $parent->result();
     }
@@ -286,7 +306,8 @@ class Admin_model extends CI_Model {
      * @Get all Liabilities Sub Child
      * @return object
      * */
-    public function getAllLiabilitiesSubChild() {
+    public function getAllLiabilitiesSubChild()
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => 4));
         return $parent->result();
     }
@@ -296,7 +317,8 @@ class Admin_model extends CI_Model {
      * @Get all Liabilities Sub Child under sub
      * @return object
      * */
-    public function getAllLiabilitiesSubChildUnderSub($liabilities_sub_child_id_value) {
+    public function getAllLiabilitiesSubChildUnderSub($liabilities_sub_child_id_value)
+    {
         $parent = $this->db->get_where('groups', array('parent_id' => $liabilities_sub_child_id_value));
         return $parent->result();
     }
@@ -307,7 +329,8 @@ class Admin_model extends CI_Model {
      * @return bool
      */
 
-    public function insertGroupName($group_name, $parent_id, $root_parent_id, $created_by) {
+    public function insertGroupName($group_name, $parent_id, $root_parent_id, $created_by)
+    {
         $this->db->trans_begin();
         $insert_data = array(
             'group_name' => $group_name,
@@ -344,7 +367,8 @@ class Admin_model extends CI_Model {
      * @return array
      */
 
-    public function getEditGroupData($group_id) {
+    public function getEditGroupData($group_id)
+    {
         $result = $this->db->get_where('groups', array('id' => $group_id));
         return $result->result();
     }
@@ -355,7 +379,8 @@ class Admin_model extends CI_Model {
      * @return array
      */
 
-    public function updateGroupData($update_id, $group_name, $parent_id, $root_parent_id, $updated_by) {
+    public function updateGroupData($update_id, $group_name, $parent_id, $root_parent_id, $updated_by)
+    {
         $this->db->trans_begin();
         $update_id = array(
             'id' => $update_id
@@ -383,7 +408,8 @@ class Admin_model extends CI_Model {
      * @return bool
      */
 
-    public function insertLedger($ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $created_by) {
+    public function insertLedger($ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $created_by)
+    {
         $this->db->trans_begin();
         $insert_data = array(
             'group_id' => $ledger_parent,
@@ -411,7 +437,8 @@ class Admin_model extends CI_Model {
      * @return bool
      */
 
-    public function updateLedger($ledger_id, $ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $updated_by) {
+    public function updateLedger($ledger_id, $ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $updated_by)
+    {
         $this->db->trans_begin();
         $insert_data = array(
             'group_id' => $ledger_parent,
@@ -439,7 +466,8 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getAllLedgerAccount($ledger_id) {
+    public function getAllLedgerAccount($ledger_id)
+    {
         $result = $this->db->get_where('ledgers', array('group_id' => $ledger_id));
         return $result->result();
     }
@@ -450,7 +478,8 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getLedgerUpdateData($ledger_id) {
+    public function getLedgerUpdateData($ledger_id)
+    {
         $result = $this->db->get_where('ledgers', array('id' => $ledger_id));
         return $result->result();
     }
@@ -461,7 +490,8 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getDebitLedgerBalance($ledger_balnce_id) {
+    public function getDebitLedgerBalance($ledger_balnce_id)
+    {
         $this->db->select('balance, ledger_name');
         $this->db->from('ledgers');
         $this->db->where('ledgers.id', $ledger_balnce_id);
@@ -476,7 +506,8 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getAllLedger() {
+    public function getAllLedger()
+    {
         $this->db->select('*');
         $this->db->from('ledgers');
         $result = $this->db->get();
@@ -489,7 +520,8 @@ class Admin_model extends CI_Model {
      * @return object
      */
 
-    public function getAllSubGroups($id) {
+    public function getAllSubGroups($id)
+    {
         $this->db->select("groups.*,(SELECT group_name FROM `groups` WHERE id = '$id') as parent_name");
         $this->db->from('groups');
         $this->db->where('groups.parent_id', $id);
@@ -503,7 +535,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertPaymode($insert_data) {
+    public function insertPaymode($insert_data)
+    {
         $result = $this->db->insert('pay_mode', $insert_data);
         if ($result) {
             return TRUE;
@@ -516,7 +549,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function getAllPayModeName() {
+    public function getAllPayModeName()
+    {
         $this->db->select('*');
         $this->db->from('pay_mode');
         $result = $this->db->get();
@@ -529,7 +563,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertBank($insert_data) {
+    public function insertBank($insert_data)
+    {
         $result = $this->db->insert('cheque_register', $insert_data);
         if ($result) {
             return TRUE;
@@ -542,7 +577,8 @@ class Admin_model extends CI_Model {
      * return array
      */
 
-    public function getAllBankName() {
+    public function getAllBankName()
+    {
         $this->db->select('ledgers.ledger_name,ledgers.id');
         $this->db->from('ledgers');
         $this->db->where('ledgers.group_id', 7);
@@ -556,7 +592,8 @@ class Admin_model extends CI_Model {
      * return array
      */
 
-    public function getAllChequeBookNumber() {
+    public function getAllChequeBookNumber()
+    {
         $this->db->select('*');
         $this->db->from('cheque_register');
         $this->db->where('status', 'active');
@@ -571,7 +608,8 @@ class Admin_model extends CI_Model {
      * return array
      */
 
-    public function getAllChequeNumberAgnBook($cheque_book_number) {
+    public function getAllChequeNumberAgnBook($cheque_book_number)
+    {
         $this->db->select('cheque_number, id');
         $this->db->from('cheque_register');
         $this->db->where('status', 'active');
@@ -586,7 +624,8 @@ class Admin_model extends CI_Model {
      * return array
      */
 
-    public function getAllChequeNumber() {
+    public function getAllChequeNumber()
+    {
         $this->db->select('cheque_register.*, ledgers.ledger_name');
         $this->db->from('cheque_register');
         $this->db->join('ledgers', 'ledgers.id = cheque_register.bank_id');
@@ -603,7 +642,8 @@ class Admin_model extends CI_Model {
      * return array
      */
 
-    public function getBankNameONChequeNumber($bank_name_on_chequeNumber_row) {
+    public function getBankNameONChequeNumber($bank_name_on_chequeNumber_row)
+    {
         $this->db->select('cheque_register.*, ledgers.ledger_name, ledgers.id as ledger_id');
         $this->db->from('cheque_register');
         $this->db->join('ledgers', 'ledgers.id = cheque_register.bank_id');
@@ -620,7 +660,8 @@ class Admin_model extends CI_Model {
      * return object
      */
 
-    public function getPaymentVoucherId() {
+    public function getPaymentVoucherId()
+    {
         $this->db->select('*');
         $this->db->from('payment_voucher_entries');
         $result = $this->db->get();
@@ -633,7 +674,8 @@ class Admin_model extends CI_Model {
      * return object
      */
 
-    public function getReceiveVoucherId() {
+    public function getReceiveVoucherId()
+    {
         $this->db->select('*');
         $this->db->from('receive_voucher_entries');
         $result = $this->db->get();
@@ -646,7 +688,8 @@ class Admin_model extends CI_Model {
      * return object
      */
 
-    public function getJournalVoucherId() {
+    public function getJournalVoucherId()
+    {
         $this->db->select('*');
         $this->db->from('journal_voucher_entries');
         $result = $this->db->get();
@@ -659,34 +702,10 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getContraVoucherId() {
+    public function getContraVoucherId()
+    {
         $this->db->select('*');
         $this->db->from('contra_voucher_entries');
-        $result = $this->db->get();
-        return $result->num_rows();
-    }
-
-    /*
-     * @ get Last entry id member entry
-     * @ access public
-     * @ return boolean
-     */
-
-    public function getMemberEntryId() {
-        $this->db->select('*');
-        $this->db->from('member_truck_entry');
-        $result = $this->db->get();
-        return $result->num_rows();
-    }
-    /*
-     * @ get Last entry id non member entry
-     * @ access public
-     * @ return boolean
-     */
-
-    public function getNonMemberEntryId() {
-        $this->db->select('*');
-        $this->db->from('non_member_truck_entry');
         $result = $this->db->get();
         return $result->num_rows();
     }
@@ -697,34 +716,11 @@ class Admin_model extends CI_Model {
      * @ return object
      */
 
-    public function getMemberTruckList() {
+    public function getMemberTruckList()
+    {
         $this->db->select('truck_tbl_id, truck_number');
         $this->db->from('truck');
         $this->db->where('truck.truck_type', 'A');
-        $result = $this->db->get();
-        return $result->result_array();
-    }
-
-    /*
-     * @ get member entry truck list
-     * @ access public
-     * @ return object
-     */
-    public function getMemberEntryTruckList() {
-        $this->db->select('member_truck_entry.*, truck.truck_number');
-        $this->db->from('member_truck_entry');
-        $this->db->join('truck','truck.truck_tbl_id = member_truck_entry.truck_no');
-        $result = $this->db->get();
-        return $result->result_array();
-    }
-    /*
-     * @ get non member entry truck list
-     * @ access public
-     * @ return object
-     */
-    public function getNonMemberEntryTruckList() {
-        $this->db->select('*');
-        $this->db->from('non_member_truck_entry');
         $result = $this->db->get();
         return $result->result_array();
     }
@@ -735,11 +731,12 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertPaymentVoucher($voucher_master_data, $cheque_book_number, $cheque_number) {
+    public function insertPaymentVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    {
         $result = $this->db->insert('payment_voucher_entries', $voucher_master_data);
         $insert_id = $this->db->insert_id();
         if ($result) {
-            if (!empty($cheque_book_number) and ! empty($cheque_number)) {
+            if (!empty($cheque_book_number) and !empty($cheque_number)) {
                 $update_cheque_number = array(
                     'cheque_book_number' => $cheque_book_number,
                     'cheque_number' => $cheque_number
@@ -759,7 +756,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertPaymentVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length) {
+    public function insertPaymentVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
+    {
         $this->db->trans_begin();
         for ($i = 0; $i < $length; $i++) {
             $details_data = array(
@@ -818,11 +816,12 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertReceiveVoucher($voucher_master_data, $cheque_book_number, $cheque_number) {
+    public function insertReceiveVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    {
         $result = $this->db->insert('receive_voucher_entries', $voucher_master_data);
         $insert_id = $this->db->insert_id();
         if ($result) {
-            if (!empty($cheque_book_number) and ! empty($cheque_number)) {
+            if (!empty($cheque_book_number) and !empty($cheque_number)) {
                 $update_cheque_number = array(
                     'cheque_book_number' => $cheque_book_number,
                     'cheque_number' => $cheque_number
@@ -842,7 +841,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertReceiveVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length) {
+    public function insertReceiveVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
+    {
         $this->db->trans_begin();
         for ($i = 0; $i < $length; $i++) {
             $details_data = array(
@@ -895,11 +895,12 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertJournalVoucher($voucher_master_data, $cheque_book_number, $cheque_number) {
+    public function insertJournalVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    {
         $result = $this->db->insert('journal_voucher_entries', $voucher_master_data);
         $insert_id = $this->db->insert_id();
         if ($result) {
-            if (!empty($cheque_book_number) and ! empty($cheque_number)) {
+            if (!empty($cheque_book_number) and !empty($cheque_number)) {
                 $update_cheque_number = array(
                     'cheque_book_number' => $cheque_book_number,
                     'cheque_number' => $cheque_number
@@ -919,7 +920,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertJournalVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length) {
+    public function insertJournalVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
+    {
         $this->db->trans_begin();
         for ($i = 0; $i < $length; $i++) {
             $details_data = array(
@@ -972,11 +974,12 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertContraVoucher($voucher_master_data, $cheque_book_number, $cheque_number) {
+    public function insertContraVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    {
         $result = $this->db->insert('contra_voucher_entries', $voucher_master_data);
         $insert_id = $this->db->insert_id();
         if ($result) {
-            if (!empty($cheque_book_number) and ! empty($cheque_number)) {
+            if (!empty($cheque_book_number) and !empty($cheque_number)) {
                 $update_cheque_number = array(
                     'cheque_book_number' => $cheque_book_number,
                     'cheque_number' => $cheque_number
@@ -996,7 +999,8 @@ class Admin_model extends CI_Model {
      * return bool
      */
 
-    public function insertContraVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length) {
+    public function insertContraVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
+    {
         $this->db->trans_begin();
         for ($i = 0; $i < $length; $i++) {
             $details_data = array(
@@ -1044,10 +1048,83 @@ class Admin_model extends CI_Model {
     }
 
     /**
+     * @ insert member truck voucher
+     * @ access public
+     * return bool
+     */
+    public function insert_member_truck_voucher($post)
+    {
+//        echo '<pre>';
+//        print_r($post);die();
+        $master_data = array(
+            'total_amount' => $post['total_amount'],
+            'created_by' => $_SESSION['username'],
+            'note' => $post['note'],
+        );
+        $truck_member_exits_balance_data = $this->db->select('balance')->from('ledgers')->where('id', 19)->get()->result_array();
+        $updated_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
+        $this->db->update('ledgers', array('balance' => $updated_balance), array('id' => 19));
+        $result = 0;
+        $ins_result = $this->db->insert('member_truck_voucher_master', $master_data);
+        $insert_id = $this->db->insert_id();
+        if ($ins_result) {
+            $length = count($post['truck_id']);
+            for ($i = 0; $i < $length; $i++) {
+                $details_data = array(
+                    'member_truck_voucher_master_id' => $insert_id,
+                    'truck_id' => $post['truck_id'][$i],
+                    'truck_member_id' => $post['truck_member_id'][$i],
+                    'amount' => $post['amount'][$i],
+                    'entry_date' => date('Y-m-d', strtotime($post['e_date'][$i])),
+                    'created_by' => $_SESSION['username']
+                );
+                $de_insert = $this->db->insert('member_truck_voucher_details', $details_data);
+                if ($de_insert) {
+                    $result = 1;
+                }
+            }
+        }
+        if ($result == 1) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    /**
+     * @ insert non member truck voucher
+     * @ access public
+     * return bool
+     */
+    public function insert_non_member_truck_voucher($post)
+    {
+        $non_member_truck_voucher_data = array(
+            'entry_date' => date('Y-m-d', strtotime($post['entry_date'])),
+            'truck_count' => $post['truck_count'],
+            'total_amount' => $post['total_amount'],
+            'note' => $post['narration'],
+            'created_by' => $_SESSION['username']
+        );
+        $truck_member_exits_balance_data = $this->db->select('balance')->from('ledgers')->where('id', 20)->get()->result_array();
+        $updated_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
+        $ledger_update = $this->db->update('ledgers', array('balance' => $updated_balance), array('id' => 20));
+        if($ledger_update){
+            $result = $this->db->insert('non_member_truck_voucher', $non_member_truck_voucher_data);
+            if ($result) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+    }
+
+
+    /**
      * Add Truck
      * return boolean
      * */
-    public function addTruck($insert_data) {
+    public function addTruck($insert_data)
+    {
         $result = $this->db->insert('truck', $insert_data);
         if ($result) {
             return TRUE;
@@ -1060,28 +1137,30 @@ class Admin_model extends CI_Model {
      * List of Truck
      * return object
      */
-    public function truckList() {
+    public function truckList()
+    {
         $truck_list = $this->db->select('*, ledgers.ledger_name, member.account_id')
-                        ->from('truck')
-                        ->join('member', 'member.member_id = truck.member_id')
-                        ->join('ledgers', 'member.account_id = ledgers.id')
-                        ->where('truck.status', 'Active')
-                        ->order_by('truck.truck_tbl_id', 'DESC')
-                        ->get()->result_array();
+            ->from('truck')
+            ->join('member', 'member.member_id = truck.member_id')
+            ->join('ledgers', 'member.account_id = ledgers.id')
+            ->where('truck.status', 'Active')
+            ->order_by('truck.truck_tbl_id', 'DESC')
+            ->get()->result_array();
         return $truck_list;
     }
-    
+
     /**
      * @ get all member account
      * @ return object
      * @ access public
      */
-    public function getAllMemberAccount(){
-         $result = $this->db->select('id,group_id,ledger_name')
-                        ->from('ledgers')
-                        ->where('ledgers.status', 'Active')
-                        ->where('ledgers.group_id', 25)
-                        ->get()->result_array();
+    public function getAllMemberAccount()
+    {
+        $result = $this->db->select('id,group_id,ledger_name')
+            ->from('ledgers')
+            ->where('ledgers.status', 'Active')
+            ->where('ledgers.group_id', 25)
+            ->get()->result_array();
         return $result;
     }
 
@@ -1089,12 +1168,13 @@ class Admin_model extends CI_Model {
      * List of Member
      * return object
      */
-    public function memberList() {
+    public function memberList()
+    {
         $truck_list = $this->db->select('member.*, ledgers.ledger_name')
-                        ->from('member')
-                        ->join('ledgers', 'ledgers.id = member.account_id')
-                        ->where('member.status', 'Active')
-                        ->get()->result_array();
+            ->from('member')
+            ->join('ledgers', 'ledgers.id = member.account_id')
+            ->where('member.status', 'Active')
+            ->get()->result_array();
         return $truck_list;
     }
 

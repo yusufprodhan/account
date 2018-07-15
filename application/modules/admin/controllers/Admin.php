@@ -1241,12 +1241,12 @@ class Admin extends MY_Controller
                     <label for="truck_member">Member: <span>*</span></label><br>
                     <select class="form-control" name="truck_member" id="truck_member" required="required">
                         <option>Select Member</option>';
-                        if(!empty($member_list)){
-                            foreach($member_list as $m_list){
-                               echo '<option '.(($result[0]["member_id"] == $m_list["member_id"]? "Selected":"")).' value="'.$m_list["member_id"].'">'.$m_list["ledger_name"].'</option>';
-                            }
-                        }
-                    echo'</select>
+                if (!empty($member_list)) {
+                    foreach ($member_list as $m_list) {
+                        echo '<option ' . (($result[0]["member_id"] == $m_list["member_id"] ? "Selected" : "")) . ' value="' . $m_list["member_id"] . '">' . $m_list["ledger_name"] . '</option>';
+                    }
+                }
+                echo '</select>
                 </div>
             </div>
             <div class="col-md-3">
@@ -1634,44 +1634,18 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Member Truck Entry';
         $data->username = $_SESSION['username'];
-
-//        $this->load->library('form_validation');
-//        $config = array(
-//            array(
-//                'field' => 'truck_no',
-//                'label' => 'Truck No',
-//                'rules' => 'required',
-//                'errors' => array(
-//                    'required' => 'You must provide %s',
-//                ),
-//            ),
-//        );
-//        $this->form_validation->set_rules($config);
-//        if ($this->form_validation->run() == true) {
-//
-//        }
+        $data->member_voucher_no = $this->db->select('member_truck_voucher_id')->from('member_truck_voucher_master')->get()->num_rows();
+        $this->load->library('form_validation');
         if (isset($_POST['save_member_voucher'])) {
             $post = $this->input->post();
-            echo'<pre>';
-            print_r($post);
-            $member_truck_data = array(
-                'entry_date' => date('Y-m-d', strtotime($post['entry_date'])),
-                'truck_no' => $post['truck_no'],
-                'amount' => $post['amount'],
-                'note' => $post['note'],
-                'created_by' => $_SESSION['username']
-            );
-            // echo'<pre>';
-            // print_r($memaddTruckber_truck_data);
-//                $result = $this->db->insert('member_truck_entry', $member_truck_data);
-//                if ($result) {
-//                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
-//                } else {
-//                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
-//                }
+            $result = $this->admin_model->insert_member_truck_voucher($post);
+            if ($result == TRUE) {
+                $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Member truck voucher entry successfully');
+                redirect('admin/memberTruckVoucher');
+            } else {
+                $this->session->set_flashdata('error', '<strong>Failed!</strong> Member truck voucher entry Failed');
+            }
         }
-        $data->member_truck_entry_number = $this->admin_model->getMemberEntryId();
-        $data->entry_truck_list = $this->admin_model->getMemberEntryTruckList();
         $data->truck_list = $this->admin_model->getMemberTruckList();
         $this->template->load('admin/template_dashboard', 'admin/member_truck_entry', $data);
     }
@@ -1695,19 +1669,19 @@ class Admin extends MY_Controller
                                                 truck_number LIKE '%$post%'")->result_array();
 //            echo $this->db->last_query();
 //            echo '<pre>';
-            if(!empty($truck_type)){
+            if (!empty($truck_type)) {
                 $type = $truck_type[0]['truck_type'];
                 $truck_amount = 0;
-                if($type == 'A'){
+                if ($type == 'A') {
                     $truck_amount = 100;
-                }else{
-                    $truck_amount = 150;
+                } else {
+                    $truck_amount = 50;
                 }
                 echo '<div class="form-group">
                         <div class="row">
                             <label for="amount" class="col-sm-3 col-form-label">Amount</label>
                             <div class="col-sm-9">
-                                <input type="text" id="amount" name="amount" class="form-control" value="'.$truck_amount.'" truck_member="'.$truck_type[0]["ledger_name"].'">
+                                <input type="text" id="amount" name="amount" class="form-control" value="' . $truck_amount . '" truck_member="' . $truck_type[0]["ledger_name"] . '" truck_member_id="' . $truck_type[0]["account_id"] . '">
                             </div>
                         </div>
                     </div>';
@@ -1724,12 +1698,13 @@ class Admin extends MY_Controller
     {
         $data = new stdClass();
         $data->title = 'Non Member Truck Entry';
+        $data->non_member_voucher_no = $this->db->select('non_member_voucher_id')->from('non_member_truck_voucher')->get()->num_rows();
         $data->username = $_SESSION['username'];
         $this->load->library('form_validation');
         $config = array(
             array(
-                'field' => 'true_no',
-                'label' => 'Truck No',
+                'field' => 'truck_count',
+                'label' => 'Truck Count',
                 'rules' => 'required',
                 'errors' => array(
                     'required' => 'You must provide %s',
@@ -1738,27 +1713,17 @@ class Admin extends MY_Controller
         );
         $this->form_validation->set_rules($config);
         if ($this->form_validation->run() == true) {
-            if (isset($_POST['save_non_member_truck'])) {
+            if (isset($_POST['save_non_member_voucher'])) {
                 $post = $this->input->post();
-                $non_member_truck_data = array(
-                    'entry_date' => date('Y-m-d', strtotime($post['entry_date'])),
-                    'truck_no' => $post['true_no'],
-                    'amount' => $post['amount'],
-                    'note' => $post['note'],
-                    'created_by' => $_SESSION['username']
-                );
-                // echo'<pre>';
-                // print_r($member_truck_data);
-                $result = $this->db->insert('non_member_truck_entry', $non_member_truck_data);
+                $result = $this->admin_model->insert_non_member_truck_voucher($post);
                 if ($result) {
-                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Truck entry successfully');
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Non member voucher entry successfully');
+                    redirect('admin/nonMemberTruckVoucher');
                 } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Truck entry Failed');
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Non member voucher entry Failed');
                 }
             }
         }
-        $data->non_member_truck_entry_number = $this->admin_model->getNonMemberEntryId();
-        $data->non_mem_entry_truck_list = $this->admin_model->getNonMemberEntryTruckList();
         $this->template->load('admin/template_dashboard', 'admin/non_member_truck_entry', $data);
     }
 

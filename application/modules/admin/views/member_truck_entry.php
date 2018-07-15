@@ -46,6 +46,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <div class="row">
+                                            <label for="member_truck_voucher_no" class="col-sm-3 col-form-label">Voucher No.</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" readonly id="member_truck_voucher_no" value="<?php if(isset($member_voucher_no)){echo $member_voucher_no+1;}?>" name="member_truck_voucher_no" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
                                             <label for="entry_date" class="col-sm-3 col-form-label">Entry Date</label>
                                             <div class="col-sm-9">
                                                 <input type="text" id="entry_date" name="entry_date" class="form-control dateinput">
@@ -81,7 +89,7 @@
                             </div>
                         </div>                        
                         <div class="col-md-6">                            
-                            <button type="button" id="add_member_truck" class="btn btn-success pull-right">Add</button>
+                            <button type="button" id="add_member_truck" class="btn btn-success pull-right" style="display: none;">Add</button>
                         </div>
                     </div>
                     <div class="row">
@@ -135,6 +143,7 @@
             numchange = numchange.replace(/\.(?=.*\.)/, '');
             $(this).val(numchange);
         });
+        $('#add_member_truck').hide();
 
 //        $('#true_no').select2({
 //            placeholder: "Select Truck",
@@ -150,8 +159,8 @@
             $(document).find('#total_amount').val(final_amount);
         });
 
-        $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
-        $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});       
+        $('.alert-success').delay(2500).hide(300).css({'color': 'green'});
+        $('.alert-danger').delay(2500).hide(300).css({'color': 'white'});
         
     });
     $(document).find('.save_member_voucher').hide();
@@ -160,12 +169,20 @@
     $(document).on("click", "#add_member_truck", function () {
         $(document).find('.save_member_voucher').show();
         var e_date = $(document).find('#entry_date').val();
+        var truck_id = $('#truck_no option:selected').val();
         var truck_number = $(document).find('#truck_no option:selected').attr('truck_num');
         var truck_member = $(document).find('.truck_amount #amount').attr('truck_member');
+        var truck_member_id = $(document).find('.truck_amount #amount').attr('truck_member_id');
         var amount = $(document).find('#amount').val();
         var html = '<tr>' +
-                '<td><input type="text" class="form-control" readonly name="truck_no[]" value="' + truck_number + '" ></td>' +
-                '<td><input type="text" class="form-control" readonly name="truck_member[]" value="' + truck_member + '" ></td>' +
+                '<td>' +
+                '<input type="hidden" class="form-control" readonly name="truck_id[]" value="' + truck_id + '" >' +
+                '<input type="text" class="form-control" readonly name="truck_no[]" value="' + truck_number + '" >' +
+                '</td>' +
+                '<td>' +
+                '<input type="hidden" class="form-control" readonly name="truck_member_id[]" value="' + truck_member_id + '" >' +
+                '<input type="text" class="form-control" readonly name="truck_member[]" value="' + truck_member + '" >' +
+                '</td>' +
                 '<td><input type="text" class="form-control amount" readonly name="amount[]" value="' + amount + '" ></td>' +
                 '<td><input type="text" class="form-control" readonly name="e_date[]" value="' + e_date + '" ></td>' +
                 '<td><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" title="Delete"></a></td>' +
@@ -186,8 +203,9 @@
     }
     
     // truck type
-    $(document).on('change', '', function () {
+    $(document).on('change', '#truck_no', function () {
         $(document).find('.save_member_voucher').hide();
+        $(document).find('#add_member_truck').css('display', 'block');
         var truck_number = $('option:selected', this).attr('truck_num');
         // console.log(truck_number);
         $.ajax({
