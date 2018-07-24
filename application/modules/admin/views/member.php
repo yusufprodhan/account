@@ -90,7 +90,7 @@
                     <div class="col-md-12">
                         <form class="form-horizontal" action="<?php echo site_url() ?>admin/member" method="post" enctype="multipart/form-data">
                             <div class="row">                                
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="account_name">Account No: <span style="color:red;">*</span></label><br>
                                         <select class="form-control select2 account_name" name="account_name" id="account_name">
@@ -105,21 +105,21 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="truck_no">Truck No:</label><br>
-                                        <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
-                                            <option></option>
-                                            <?php if(isset($all_truck)){?>
-                                                <?php if(!empty($all_truck)){?>
-                                                    <?php foreach($all_truck as $truck){?>
-                                                        <option value="<?php echo $truck['truck_tbl_id']?>"><?php echo $truck['truck_number']?></option>
-                                                    <?php }?>
-                                                <?php }?>
-                                            <?php }?>
-                                        </select>
-                                    </div>
-                                </div>
+<!--                                <div class="col-md-6">-->
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="truck_no">Truck No:</label><br>-->
+<!--                                        <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">-->
+<!--                                            <option></option>-->
+<!--                                            --><?php //if(isset($all_truck)){?>
+<!--                                                --><?php //if(!empty($all_truck)){?>
+<!--                                                    --><?php //foreach($all_truck as $truck){?>
+<!--                                                        <option value="--><?php //echo $truck['truck_tbl_id']?><!--">--><?php //echo $truck['truck_number']?><!--</option>-->
+<!--                                                    --><?php //}?>
+<!--                                                --><?php //}?>
+<!--                                            --><?php //}?>
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="member_no">Member No: <span style="color:red;">*</span></label><br>

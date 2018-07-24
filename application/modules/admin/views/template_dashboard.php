@@ -47,7 +47,7 @@
                 <div class="col-md-3 left_col">
                     <div class="left_col scroll-view">
                         <div class="navbar nav_title" style="border: 0;">
-                            <a href="<?php echo site_url() ?>admin" class="site_title"> <span>Hili Truck Mailk Group</span></a>
+                            <a href="<?php echo site_url() ?>admin" class="site_title"> <span><?php if(!empty($company_info)){echo $company_info[0]['company_name'];}?></span></a>
                         </div>
 
                         <div class="clearfix"></div>
@@ -55,18 +55,11 @@
                         <!-- menu profile quick info -->
                         <div class="profile clearfix">
                             <div class="profile_pic">
-                                <img src="
-                                <?php
-                                //if ($profile_image == TRUE) {
-                                //echo site_url() . 'assets/uploads/' . $_SESSION['user_id'] . '/' . $profile_image;
-                                //} //else {
-                                // echo site_url() . 'assets/images/user.png';
-                                //}
-                                ?>" alt="..." class="img-circle profile_img" width="65px">
+                                <img src="" alt="..." class="img-circle profile_img" width="65px">
                             </div>
                             <div class="profile_info">
                                 <span>Welcome,</span>
-                                <h2><?= $username; ?></h2>
+                                <h2><?php if(!empty($username)){echo $username;}?></h2>
                             </div>
                         </div>
                         <!-- /menu profile quick info -->
@@ -77,9 +70,9 @@
                                     <li><a href="<?= site_url() . $_SESSION['username']; ?>"><i class="fa fa-home"></i> Dashboard</a></li>
                                     <?php if ($_SESSION['user_type'] == 'admin'): ?>                                        
                                         <li>
-                                            <a><i class="fa fa-address-book"></i> Company Information <span class="fa fa-chevron-down"></span></a>
+                                            <a><i class="fa fa-address-book"></i>Company Setup<span class="fa fa-chevron-down"></span></a>
                                             <ul class="nav child_menu">                                                                                                
-                                                <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/companyList">Company</a></li>                                                                                       
+                                                <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/updateCompanyInfo">Update Company info</a></li>
                                             </ul>
                                         </li>
                                         <li>
@@ -114,6 +107,45 @@
                                                 <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/memberTruckVoucher">Member Truck Voucher</a></li>
                                                 <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/nonMemberTruckVoucher">Non Member Voucher</a></li>
                                             </ul>
+                                        </li>
+                                        <li>
+                                            <a><i class="fa fa-pie-chart"></i>Reports<span class="fa fa-chevron-down"></span></a>
+                                            <ul class="nav child_menu">
+                                                <li>
+                                                    <a>Transaction Reports<span class="fa fa-chevron-down"></span></a>
+                                                    <ul class="nav child_menu">
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/paymentVoucherReport">Payment Voucher Report</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/receiveVoucherReport">Receive Voucher Report</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/journalVoucherReport">Journal Voucher Report</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/cashStatement">Cash Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/bankStatement">Bank Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/cashAndBankStatement">Cash & Bank Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/chequeStatement">Cheque Statement</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                                                    <ul class="nav child_menu">
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/ledgerWiseAccountStatement">Ledger Wise Account Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/journalStatement">Journal Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/groupWiseLedgerStatement">Group Wise Ledger Statement</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a>Financial State. Report<span class="fa fa-chevron-down"></span></a>
+                                                    <ul class="nav child_menu">
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/atAGlanceStatement">At a Glance Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/incomeStatement">Income Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/expensesStatement">Expenses Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/accountPayableStatement">Account Payable Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/accountReceivableStatement">Account Receivable Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/profitAndLossAccount">Profit & Loss Account</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/trialBalanceStatement">Trial Balance Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/balanceSheet">Balance Sheet</a></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+
                                         </li>
                                         <li>
                                             <a><i class="fa fa-wrench"></i>Configure<span class="fa fa-chevron-down"></span></a>

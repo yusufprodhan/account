@@ -23,7 +23,7 @@ class Login extends MY_Controller {
         $this->load->library('form_validation');
         $data = new stdClass();
         $data->title = "Login";
-
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>1))->result_array();
         /* logout */
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
@@ -61,15 +61,9 @@ class Login extends MY_Controller {
                     case 'admin':
                         redirect('/admin/');
                         break;
-
                     case 2:
                         redirect('/accounts/');
                         break;
-
-                    case 3:
-                        redirect('/waiter/');
-                        break;
-
                     default:
                         redirect('/login/');
                         break;

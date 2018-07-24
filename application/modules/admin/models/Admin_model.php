@@ -1061,9 +1061,17 @@ class Admin_model extends CI_Model
             'created_by' => $_SESSION['username'],
             'note' => $post['note'],
         );
-        $truck_member_exits_balance_data = $this->db->select('balance')->from('ledgers')->where('id', 19)->get()->result_array();
+        //update member truck fee
+        $truck_member_exits_balance_data = $this->db->select('balance, credit')->from('ledgers')->where('id', 19)->get()->result_array();
         $updated_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
-        $this->db->update('ledgers', array('balance' => $updated_balance), array('id' => 19));
+        $updated_credit = $truck_member_exits_balance_data[0]['credit'] + $post['total_amount'];
+        $this->db->update('ledgers', array('balance' => $updated_balance, 'credit' => $updated_credit), array('id' => 19));
+
+        //update cash in hand fee
+        $cash_in_hand_exits_balance_data = $this->db->select('balance, debit')->from('ledgers')->where('id', 1)->get()->result_array();
+        $updated_cash_in_hand_balance = $cash_in_hand_exits_balance_data[0]['balance'] + $post['total_amount'];
+        $updated_debit = $cash_in_hand_exits_balance_data[0]['debit'] + $post['total_amount'];
+        $this->db->update('ledgers', array('balance' => $updated_cash_in_hand_balance, 'debit' => $updated_debit), array('id' => 1));
         $result = 0;
         $ins_result = $this->db->insert('member_truck_voucher_master', $master_data);
         $insert_id = $this->db->insert_id();
@@ -1105,10 +1113,19 @@ class Admin_model extends CI_Model
             'note' => $post['narration'],
             'created_by' => $_SESSION['username']
         );
-        $truck_member_exits_balance_data = $this->db->select('balance')->from('ledgers')->where('id', 20)->get()->result_array();
+        //update non truck free
+        $truck_member_exits_balance_data = $this->db->select('balance,credit')->from('ledgers')->where('id', 20)->get()->result_array();
         $updated_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
-        $ledger_update = $this->db->update('ledgers', array('balance' => $updated_balance), array('id' => 20));
-        if($ledger_update){
+        $credit_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
+        $ledger_update = $this->db->update('ledgers', array('balance' => $updated_balance, 'credit' => $credit_balance), array('id' => 20));
+
+        //update cash in hand fee
+        $cash_in_hand_exits_balance_data = $this->db->select('balance, debit')->from('ledgers')->where('id', 1)->get()->result_array();
+        $updated_cash_in_hand_balance = $cash_in_hand_exits_balance_data[0]['balance'] + $post['total_amount'];
+        $updated_debit = $cash_in_hand_exits_balance_data[0]['debit'] + $post['total_amount'];
+        $this->db->update('ledgers', array('balance' => $updated_cash_in_hand_balance, 'debit' => $updated_debit), array('id' => 1));
+
+        if ($ledger_update) {
             $result = $this->db->insert('non_member_truck_voucher', $non_member_truck_voucher_data);
             if ($result) {
                 return TRUE;

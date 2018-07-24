@@ -33,6 +33,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Dashboard';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         //$data->profile_image = $this->admin_model->get_profile_image($_SESSION['user_id']);
 
         $this->template->load('admin/template_dashboard', 'admin/dashboard', $data);
@@ -209,6 +210,7 @@ class Admin extends MY_Controller
         $data->title = 'Char Of Account';
         $data->username = $_SESSION['username'];
         $this->load->library('form_validation');
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->account_main_chart = $this->admin_model->get_all_base_chart();
         $this->template->load('admin/template_dashboard', 'admin/group_list_of_account', $data);
     }
@@ -226,6 +228,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'create Group';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['create_group'])) {
             $config = array(
@@ -304,6 +307,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Edit Group';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->get_editable_group = $this->admin_model->getEditGroupData($group_id);
         $data->assets_group = $this->admin_model->getAllAssetsParents();
         $data->assets_sub_childs = $this->admin_model->getAllAssetsSubChild();
@@ -355,6 +359,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Group';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['update_group'])) {
             $config = array(
@@ -398,6 +403,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create Ledger';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['create_ledger'])) {
             $config = array(
@@ -452,6 +458,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Ledger List';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->get_all_ledger = $this->admin_model->getAllLedgerAccount($ledger_id);
         $this->template->load('admin/template_dashboard', 'admin/ledger_list', $data);
     }
@@ -469,6 +476,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Ledger Account';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $data->all_accounts = $this->admin_model->getAllLedger();
         if (isset($_POST['update_ledger'])) {
@@ -642,6 +650,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Sub Chart of Account';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->sub_groups = $this->admin_model->getAllSubGroups($id);
         $this->template->load('admin/template_dashboard', 'admin/sub_group_of_account', $data);
     }
@@ -657,6 +666,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create pay mode';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -695,6 +705,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create Bank';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $config = array(
@@ -822,6 +833,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Payment Voucher';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -903,6 +915,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Receive Voucher';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -984,6 +997,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Journal Voucher';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -1065,6 +1079,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Contra Voucher';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -1154,6 +1169,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Truck';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -1283,6 +1299,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Truck';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -1356,6 +1373,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Member';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -1371,6 +1389,7 @@ class Admin extends MY_Controller
         if ($this->form_validation->run() == true) {
             if (isset($_POST['add_member'])) {
                 $inputs = $this->input->post();
+                $user_id = $_SESSION['username'];
 
                 $configure['upload_path'] = './uploads/';
                 $configure['allowed_types'] = 'gif|jpg|png|jpeg';
@@ -1380,7 +1399,7 @@ class Admin extends MY_Controller
                 $pic_data = $this->upload->data();
                 $member_data = array(
                     'account_id' => $inputs['account_name'],
-                    'truck_no' => (!empty($inputs['truck_no'])) ? json_encode($inputs['truck_no']) : "0",
+//                    'truck_no' => (!empty($inputs['truck_no'])) ? json_encode($inputs['truck_no']) : "0",
                     'member_no' => $inputs['member_no'],
                     'father_name' => $inputs['father_name'],
                     'mother_name' => $inputs['mother_name'],
@@ -1423,7 +1442,7 @@ class Admin extends MY_Controller
                 $pic_data = $this->upload->data();
                 $update_data = array(
                     'account_id' => $inputs['account_update_id'],
-                    'truck_no' => (!empty($inputs['truck_no'])) ? json_encode($inputs['truck_no']) : "0",
+//                    'truck_no' => (!empty($inputs['truck_no'])) ? json_encode($inputs['truck_no']) : "0",
                     'member_no' => $inputs['member_no'],
                     'father_name' => $inputs['father_name'],
                     'mother_name' => $inputs['mother_name'],
@@ -1477,35 +1496,34 @@ class Admin extends MY_Controller
                 ->join('ledgers', 'ledgers.id = member.account_id')
                 ->where('member.member_id', $post['member_edit_id'])
                 ->get()->result_array();
-            $truck_id = json_decode($update_data[0]['truck_no']);
 
             // echo'<pre>';
             // print_r($truck_id);
-            if (!empty($truck_id)) {
-                echo '<div class="col-md-6">
+            if (!empty($update_data)) {
+                echo '<div class="col-md-12">
                 <div class="form-group">
                     <label for="account_name">Account No: <span style="color:red;">*</span></label><br>
                     <input type="hidden" name="member_edit_id" class="form-control" value="' . $update_data[0]['member_id'] . '">
                     <input type="hidden" name="account_update_id" class="form-control" value="' . $update_data[0]['account_id'] . '">
                     <input type="text" id="account_name" name="account_name" class="form-control" readonly value="' . $update_data[0]['ledger_name'] . '">
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="truck_no">Truck No:</label><br>
-                    <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
-                        <option></option>';
-                if (isset($all_truck)) {
-                    if (!empty($all_truck)) {
-                        foreach ($all_truck as $truck) {
-                            echo '<option ' . (in_array($truck["truck_tbl_id"], $truck_id) ? "selected" : "") . ' value="' . $truck["truck_tbl_id"] . '">' . $truck["truck_number"] . '</option>';
-                        }
-                    }
-                }
-                echo '</select>
-                </div>
-            </div>
-            <div class="col-md-4">
+            </div>';
+//            <div class="col-md-6">
+//                <div class="form-group">
+//                    <label for="truck_no">Truck No:</label><br>
+//                    <select class="form-control select2 truck_no" name="truck_no[]" id="truck_no" multiple="multiple">
+//                        <option></option>';
+//                if (isset($all_truck)) {
+//                    if (!empty($all_truck)) {
+//                        foreach ($all_truck as $truck) {
+//                            echo '<option ' . (in_array($truck["truck_tbl_id"], $truck_id) ? "selected" : "") . ' value="' . $truck["truck_tbl_id"] . '">' . $truck["truck_number"] . '</option>';
+//                        }
+//                    }
+//                }
+//                echo '</select>
+//                </div>
+//            </div>
+            echo '<div class="col-md-4">
                 <div class="form-group">
                     <label for="member_no">Member No: <span style="color:red;">*</span></label><br>
                     <input type="text" id="member_no" name="member_no" class="form-control" required="required" value="' . $update_data[0]['member_no'] . '">  
@@ -1625,7 +1643,7 @@ class Admin extends MY_Controller
     }
 
     /**
-     * @ member truck entry
+     * @ member voucher entry
      * @ access public
      * @ return boolean
      */
@@ -1634,6 +1652,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Member Truck Entry';
         $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->member_voucher_no = $this->db->select('member_truck_voucher_id')->from('member_truck_voucher_master')->get()->num_rows();
         $this->load->library('form_validation');
         if (isset($_POST['save_member_voucher'])) {
@@ -1698,6 +1717,8 @@ class Admin extends MY_Controller
     {
         $data = new stdClass();
         $data->title = 'Non Member Truck Entry';
+        $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
         $data->non_member_voucher_no = $this->db->select('non_member_voucher_id')->from('non_member_truck_voucher')->get()->num_rows();
         $data->username = $_SESSION['username'];
         $this->load->library('form_validation');
@@ -1725,6 +1746,92 @@ class Admin extends MY_Controller
             }
         }
         $this->template->load('admin/template_dashboard', 'admin/non_member_truck_entry', $data);
+    }
+
+    /**
+     * Update company info
+     * access public
+     * return object
+    */
+    public function updateCompanyInfo(){
+        $data = new stdClass();
+        $data->title = 'Update Company Information';
+        $data->username = $_SESSION['username'];
+        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+//        echo '<pre>';
+//        print_r($data->company_info);
+        if(empty($data->company_info)){
+            if(isset($_POST['save_company_info'])){
+                $post = $this->input->post();
+                $comapny_data =array(
+                    'user_id'=> $_SESSION['user_id'],
+                    'company_name'=> $post['name_of_company'],
+                    'business_type'=> $post['name_of_business'],
+                    'registrated_address'=> $post['registrated_address'],
+                    'country_of_origin'=> $post['country_of_origin'],
+                    'telephone_no'=> $post['telephone_no'],
+                    'fax_no'=> $post['fax_no'],
+                    'mobile_no'=> $post['mobile_no'],
+                    'web_address'=> $post['web_address'],
+                    'email'=> $post['email'],
+                    'glance_description'=> $post['at_glance_brief_description']
+                );
+                $result = $this->db->insert('company_information', $comapny_data);
+                if ($result) {
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Company Information Updated Successfully.');
+                    redirect('admin/updateCompanyInfo');
+                } else {
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Company Information Updated Failed');
+                }
+//            if ($result == TRUE) {
+//                $data->status = '<div class="alert alert-success" role="alert">
+//                        <button type="button" class="close text-gray-darker" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>Company Information Updated Successfully.</div>';
+//            }else {
+//                // Registration failed
+//                $data->status = '<div class="alert alert-danger" role="alert">
+//                        <button type="button" class="close text-gray-darker" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button><span class="fa-stack fa-lg m-r-1">
+//                          <i class="fa fa-circle-thin fa-stack-2x text-warning"></i>
+//                          <i class="fa fa-exclamation fa-stack-1x text-warning"></i>
+//                        </span>Company Information Updated Failed</div>';
+//            }
+            }
+        }else{
+            if(isset($_POST['update_company_info'])){
+                $post = $this->input->post();
+                $comapny_data =array(
+                    'company_name'=> $post['name_of_company'],
+                    'business_type'=> $post['name_of_business'],
+                    'registrated_address'=> $post['registrated_address'],
+                    'country_of_origin'=> $post['country_of_origin'],
+                    'telephone_no'=> $post['telephone_no'],
+                    'fax_no'=> $post['fax_no'],
+                    'mobile_no'=> $post['mobile_no'],
+                    'web_address'=> $post['web_address'],
+                    'email'=> $post['email'],
+                    'glance_description'=> $post['at_glance_brief_description']
+                );
+                $result = $this->db->update('company_information', $comapny_data, array('user_id'=> $_SESSION['user_id']));
+                if ($result) {
+                    $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Company Information Updated Successfully.');
+                    redirect('admin/updateCompanyInfo');
+                } else {
+                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Company Information Updated Failed');
+                }
+//            if ($result == TRUE) {
+//                $data->status = '<div class="alert alert-success" role="alert">
+//                        <button type="button" class="close text-gray-darker" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>Company Information Updated Successfully.</div>';
+//            }else {
+//                // Registration failed
+//                $data->status = '<div class="alert alert-danger" role="alert">
+//                        <button type="button" class="close text-gray-darker" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button><span class="fa-stack fa-lg m-r-1">
+//                          <i class="fa fa-circle-thin fa-stack-2x text-warning"></i>
+//                          <i class="fa fa-exclamation fa-stack-1x text-warning"></i>
+//                        </span>Company Information Updated Failed</div>';
+//            }
+            }
+        }
+
+        $this->template->load('admin/template_dashboard', 'admin/updateCompanyInfo', $data);
     }
 
 }

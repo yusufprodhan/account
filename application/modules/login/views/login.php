@@ -1,8 +1,9 @@
 <div class="container" style="margin-top: 113px;">
     <div class="row">
         <div class="col-md-4 mx-auto">
-            <div class="text-center mb-5">
+            <div class="text-center mb-5" style="margin-bottom: 5px !important;">
                 <img src="<?php echo base_url('assets/images/employees.png'); ?>" alt="Logo">
+                <h2><?php if(!empty($company_info)){echo $company_info[0]['company_name'];}?></h2>
             </div>
             <div style=" background-color: #f0f0f0;padding: 6% 4%; margin-top: 10px;">
                 <?php if(isset($error)): ?>
