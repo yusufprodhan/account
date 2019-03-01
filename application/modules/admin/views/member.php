@@ -38,12 +38,11 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Member ID</th>
                                     <th>Member Name</th>
-                                    <th>Member No</th>
                                     <th>Date Of Birth</th>
                                     <th>Mobile No</th>
                                     <th>Create By</th>
-                                    <th>Status</th>                        
                                     <th>Action</th>                                    
                                 </tr>
                             </thead>
@@ -53,16 +52,15 @@
                                         <?php foreach ($member_list as $member): ?>
                                             <tr>
                                                 <td><?php echo $i; $i++ ?></td>
-                                                <td><?php echo $member['ledger_name'] ?> </td>
                                                 <td><?php echo $member['member_no'] ?></td>
+                                                <td><?php echo $member['ledger_name'] ?> </td>
                                                 <td><?php echo $member['date_of_birth'] ?></td>
                                                 <td><?php echo $member['mobile_no'] ?></td>
                                                 <td><?php echo $member['created_by'] ?></td>
-                                                <td><?php echo $member['status'] ?></td>
-                                                <td>
-                                                    <button type="button" data-toggle="modal" data-target="#editMember" id="edit_member" edit_member="<?= $member['member_id'] ?>" class="btn btn-sm btn-info pull-left"> <i class="fa fa-pencil-square" aria-hidden="true"></i> Edit</button> 
-                                                    <button type="button" onclick="editSupplier(<?= $member['member_id'] ?>);" class="btn btn-sm btn-info pull-left"> <i class="fa fa-eye" aria-hidden="true"></i> View</button> 
-                                                    <button type="button" onclick="delSupplier(this, <?= $member['member_id'] ?>)" class="btn btn-sm btn-danger" style="margin-left: 5px;"><i class="fa fa-trash-o" aria-hidden="true" title="Delete Supplier "> Delete</i></button>
+                                                <td width="15%">
+                                                    <button <?php if($member['status'] == 'Created'){ echo 'disabled';}?> type="button" data-toggle="modal" data-target="#editMember" id="edit_member" edit_member="<?= $member['member_id'] ?>" class="btn btn-sm btn-info pull-left" title="Edit"> <i class="fa fa-pencil-square" aria-hidden="true"></i></button>
+                                                    <button type="button" onclick="editSupplier(<?= $member['member_id'] ?>);" class="btn btn-sm btn-info pull-left" title="View"> <i class="fa fa-eye" aria-hidden="true"></i></button>
+                                                    <button type="button" onclick="delSupplier(this, <?= $member['member_id'] ?>)" class="btn btn-sm btn-danger" style="margin-left: 5px;" title="Delete"><i class="fa fa-trash-o" aria-hidden="true" title="Delete Supplier "></i></button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

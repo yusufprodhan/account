@@ -23,6 +23,9 @@
         <link href="<?= site_url(); ?>assets/vendors/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css"/>
         <!-- NProgress -->
         <link href="<?= site_url(); ?>assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+        <!-- jQuery -->
+        <script src="<?= site_url(); ?>assets/vendors/jquery/dist/jquery.min.js"></script>
+<!--        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
 
         <!-- Datatables -->
         <link href="<?= site_url(); ?>assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
@@ -34,11 +37,11 @@
         <!-- bootstrap-datetimepicker -->
         <link href="<?= site_url(); ?>assets/vendors/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css" rel="stylesheet">
 
+        <!-- bootstrap-daterangepicker -->
+        <link href="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
         <!-- Custom styling plugins -->
         <link href="<?= site_url(); ?>assets/build/css/custom.css" rel="stylesheet">
-
-        <!-- jQuery -->
-        <script src="<?= site_url(); ?>assets/vendors/jquery/dist/jquery.min.js"></script>
     </head>
 
     <body class="nav-md">
@@ -142,6 +145,16 @@
                                                         <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/profitAndLossAccount">Profit & Loss Account</a></li>
                                                         <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/trialBalanceStatement">Trial Balance Statement</a></li>
                                                         <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/balanceSheet">Balance Sheet</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a>Truck Report<span class="fa fa-chevron-down"></span></a>
+                                                    <ul class="nav child_menu">
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/truckMemberReport">Truck Member Report</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/truckStatementMemberwise">Truck Statement Memberwise</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/truckStatementDetails">Truck Statement Details</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/truckIncomeStatement">Truck Income Statement</a></li>
+                                                        <li><a href="<?= site_url() . $_SESSION['user_type']; ?>/truckStatementNonMemberwise">Truck Statement Non Memberwise</a></li>
                                                     </ul>
                                                 </li>
                                             </ul>
@@ -358,8 +371,10 @@
         <script src="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script> 
         
         <!-- bootstrap-datetimepicker -->      
-        <script src="<?= site_url(); ?>assets/vendors/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>    
+        <script src="<?= site_url(); ?>assets/vendors/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 
+        <!-- bootstrap-daterangepicker -->
+        <script src="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
         <!-- Datatables -->
         <script src="<?= site_url(); ?>assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
         <script src="<?= site_url(); ?>assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>

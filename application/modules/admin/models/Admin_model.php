@@ -720,7 +720,8 @@ class Admin_model extends CI_Model
     {
         $this->db->select('truck_tbl_id, truck_number');
         $this->db->from('truck');
-        $this->db->where('truck.truck_type', 'A');
+//        $this->db->where('truck.truck_type', 'A');
+        $this->db->where('truck.status', 'Active');
         $result = $this->db->get();
         return $result->result_array();
     }
@@ -1054,12 +1055,17 @@ class Admin_model extends CI_Model
      */
     public function insert_member_truck_voucher($post)
     {
-//        echo '<pre>';
-//        print_r($post);die();
         $master_data = array(
             'total_amount' => $post['total_amount'],
             'created_by' => $_SESSION['username'],
             'note' => $post['note'],
+        );
+        $receive_voucher_data = array(
+            'voucher_date'=> date('Y-m-d'),
+            'voucher_type'=>'RV',
+            'total' =>$post['total_amount'],
+            'narration'=>$post['note'],
+            'created_by' => $_SESSION['username']
         );
         //update member truck fee
         $truck_member_exits_balance_data = $this->db->select('balance, credit')->from('ledgers')->where('id', 19)->get()->result_array();
@@ -1075,6 +1081,9 @@ class Admin_model extends CI_Model
         $result = 0;
         $ins_result = $this->db->insert('member_truck_voucher_master', $master_data);
         $insert_id = $this->db->insert_id();
+        $receive_vouchure = $this->db->insert('receive_voucher_entries', $receive_voucher_data);
+        $receive_vouchure_insert_id = $this->db->insert_id();
+
         if ($ins_result) {
             $length = count($post['truck_id']);
             for ($i = 0; $i < $length; $i++) {
@@ -1087,6 +1096,14 @@ class Admin_model extends CI_Model
                     'created_by' => $_SESSION['username']
                 );
                 $de_insert = $this->db->insert('member_truck_voucher_details', $details_data);
+
+                $receive_vouchure_details = array(
+                    'voucher_entries_id' =>$receive_vouchure_insert_id,
+                    'ledger_id' => '19',
+                    'tax_id' => '1',
+                    'debit_amount' =>$post['amount'][$i],
+                );
+                $receive_vouchure_details_insert = $this->db->insert('receive_voucher_entries_details', $receive_vouchure_details);
                 if ($de_insert) {
                     $result = 1;
                 }
@@ -1119,6 +1136,25 @@ class Admin_model extends CI_Model
         $credit_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
         $ledger_update = $this->db->update('ledgers', array('balance' => $updated_balance, 'credit' => $credit_balance), array('id' => 20));
 
+        //insert receive voucher
+        $receive_voucher_data = array(
+            'voucher_date'=>date('Y-m-d', strtotime($post['entry_date'])),
+            'voucher_type'=>'RV',
+            'total'=>$post['total_amount'],
+            'narration'=>$post['narration'],
+            'created_by'=>$_SESSION['username']
+        );
+        $receive_vouchure = $this->db->insert('receive_voucher_entries', $receive_voucher_data);
+        $receive_vouchure_insert_id = $this->db->insert_id();
+        if($receive_vouchure){
+            $receive_vouchure_details = array(
+                'voucher_entries_id' =>$receive_vouchure_insert_id,
+                'ledger_id' => '20',
+                'tax_id' => '1',
+                'debit_amount' =>$post['total_amount']
+            );
+            $receive_vouchure_details_insert = $this->db->insert('receive_voucher_entries_details', $receive_vouchure_details);
+        }
         //update cash in hand fee
         $cash_in_hand_exits_balance_data = $this->db->select('balance, debit')->from('ledgers')->where('id', 1)->get()->result_array();
         $updated_cash_in_hand_balance = $cash_in_hand_exits_balance_data[0]['balance'] + $post['total_amount'];
@@ -1156,12 +1192,12 @@ class Admin_model extends CI_Model
      */
     public function truckList()
     {
-        $truck_list = $this->db->select('*, ledgers.ledger_name, member.account_id')
+        $truck_list = $this->db->select('truck.*, ledgers.ledger_name, member.member_no')
             ->from('truck')
             ->join('member', 'member.member_id = truck.member_id')
             ->join('ledgers', 'member.account_id = ledgers.id')
             ->where('truck.status', 'Active')
-            ->order_by('truck.truck_tbl_id', 'DESC')
+            ->order_by('truck.member_id')
             ->get()->result_array();
         return $truck_list;
     }
@@ -1173,7 +1209,7 @@ class Admin_model extends CI_Model
      */
     public function getAllMemberAccount()
     {
-        $result = $this->db->select('id,group_id,ledger_name')
+        $result = $this->db->select('id,group_id,ledger_name,status')
             ->from('ledgers')
             ->where('ledgers.status', 'Active')
             ->where('ledgers.group_id', 25)
@@ -1187,12 +1223,178 @@ class Admin_model extends CI_Model
      */
     public function memberList()
     {
-        $truck_list = $this->db->select('member.*, ledgers.ledger_name')
+        $member_list = $this->db->select('member.*, ledgers.ledger_name,ledgers.status,ledgers.id')
             ->from('member')
             ->join('ledgers', 'ledgers.id = member.account_id')
+//            ->join('truck', 'truck.member_id = member.member_id')
             ->where('member.status', 'Active')
             ->get()->result_array();
-        return $truck_list;
+        return $member_list;
+    }
+
+    /*=======================Truck report==================================*/
+    /**
+     * Truck Member report
+     * access public
+     * return object
+     * parameter date range
+     */
+
+    public function truckMemberReport()
+    {
+        $truck_member_report = $this->db->select('member.member_no, ledgers.ledger_name, truck.truck_number, truck.truck_type')
+            ->from('member')
+            ->join('ledgers', 'ledgers.id = member.account_id')
+            ->join('truck', 'truck.member_id = member.member_id')
+            ->where('member.status', 'Active')
+            ->order_by('member.member_no')
+            ->get()->result_array();
+        return $truck_member_report;
+    }
+    /**
+    * Truck Member report
+    * access public
+    * return object
+    * parameter date range
+    */
+
+    public function truckStatementMemberwise($start_date,$end_date, $member_id)
+    {
+         $this->db->select('
+                            member.member_no,
+                            ledgers.ledger_name,
+                            member_truck_voucher_details.truck_id,
+                            member_truck_voucher_details.truck_member_id,
+                            truck.truck_number,
+                            truck.remark,
+                            (select count(member_truck_voucher_details.truck_id) from truck where truck.truck_type = "A" AND member_truck_voucher_details.truck_id = truck.truck_tbl_id) as big,                                      
+                            (select count(member_truck_voucher_details.truck_id) from truck where truck.truck_type = "B" AND member_truck_voucher_details.truck_id = truck.truck_tbl_id) as mini                                       
+                            ');
+        $this->db->from('member_truck_voucher_details');
+        $this->db->join('truck', 'member_truck_voucher_details.truck_id = truck.truck_tbl_id');
+        $this->db->join('member', 'member.account_id = member_truck_voucher_details.truck_member_id');
+        $this->db->join('ledgers', 'ledgers.id = member.account_id');
+        $this->db->where("DATE_FORMAT(member_truck_voucher_details.entry_date,'%Y-%m-%d') >=", $start_date);
+        $this->db->where("DATE_FORMAT(member_truck_voucher_details.entry_date,'%Y-%m-%d') <=", $end_date);
+        $this->db->where('member_truck_voucher_details.status', 'Active');
+        if($member_id != 'All'){
+            $this->db->where('member_truck_voucher_details.truck_member_id', $member_id);
+        }
+        $this->db->group_by('member_truck_voucher_details.truck_member_id');
+        $truck_member_report = $this->db->get()->result_array();
+        return $truck_member_report;
+    }
+    /**
+     * Truck income statement report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckIncomeStatement($start_date,$end_date)
+    {
+        $truck_income_statement_report = $this->db->select('id, voucher_date,narration,total')
+                                                ->from('receive_voucher_entries')
+                                                ->where("DATE_FORMAT(voucher_date,'%Y-%m-%d') >=", $start_date)
+                                                ->where("DATE_FORMAT(voucher_date,'%Y-%m-%d') <=", $end_date)
+                                                ->order_by('voucher_date')
+                                                ->get()->result_array();
+        return $truck_income_statement_report;
+    }
+
+    /**
+     * Truck statement report Non memberwise
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckStatementNonMemberwise($start_date,$end_date){
+        $truck_statement_report_nonmemberwise = $this->db->select('*')
+                                                        ->from('non_member_truck_voucher')
+                                                        ->where("DATE_FORMAT(entry_date,'%Y-%m-%d') >=", $start_date)
+                                                        ->where("DATE_FORMAT(entry_date,'%Y-%m-%d') <=", $end_date)
+                                                        ->order_by('entry_date')
+                                                        ->get()->result_array();
+        return $truck_statement_report_nonmemberwise;
+    }
+    /**
+     * Truck statement report Non memberwise
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getLedgerWiseAccountStatement($start_date,$end_date,$ledger_id){
+        $ledger_wise_statement = array();
+        $receive_statement = $this->db->select('receive_voucher_entries.id,
+                                                   receive_voucher_entries.voucher_date,
+                                                   receive_voucher_entries.narration,
+                                                   receive_voucher_entries.voucher_type,
+                                                   receive_voucher_entries.narration,
+                                                   ledgers.balance,
+                                                   rv.ledger_id,
+                                                   SUM(rv.debit_amount) as debit_amount,
+                                                   SUM(rv.credit_amount) as credit_amount')
+                                        ->from('receive_voucher_entries_details as rv')
+                                        ->join('ledgers','ledgers.id = rv.ledger_id')
+                                        ->join('receive_voucher_entries','receive_voucher_entries.id = rv.voucher_entries_id')
+                                        ->where("rv.ledger_id", $ledger_id)
+                                        ->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+                                        ->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+                                        ->group_by('receive_voucher_entries.voucher_date')
+                                        ->group_by('receive_voucher_entries.id')
+                                        ->get()->result_array();
+        array_push($ledger_wise_statement,$receive_statement);
+        $payment_statement = $this->db->select('payment_voucher_entries.id,
+                                                   payment_voucher_entries.voucher_date,
+                                                   payment_voucher_entries.narration,
+                                                   payment_voucher_entries.voucher_type,
+                                                   pv.ledger_id,
+                                                   SUM(pv.debit_amount)as debit_amount,
+                                                   SUM(pv.credit_amount)as credit_amount ')
+            ->from('payment_voucher_entries_details as pv')
+            ->join('payment_voucher_entries','payment_voucher_entries.id = pv.voucher_entries_id')
+            ->where("pv.ledger_id", $ledger_id)
+            ->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+            ->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+            ->group_by('payment_voucher_entries.voucher_date')
+            ->group_by('payment_voucher_entries.id')
+            ->get()->result_array();
+        array_push($ledger_wise_statement,$payment_statement);
+
+        $journal_statement = $this->db->select('journal_voucher_entries.id,
+                                                   journal_voucher_entries.voucher_date,
+                                                   journal_voucher_entries.narration,
+                                                   journal_voucher_entries.voucher_type,
+                                                   jv.ledger_id,
+                                                   SUM(jv.debit_amount) as debit_amount,
+                                                   SUM(jv.credit_amount) as credit_amount')
+            ->from('journal_voucher_entries_details as jv')
+            ->join('journal_voucher_entries','journal_voucher_entries.id = jv.voucher_entries_id')
+            ->where("jv.ledger_id", $ledger_id)
+            ->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+            ->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+            ->group_by('journal_voucher_entries.voucher_date')
+            ->group_by('journal_voucher_entries.id')
+            ->get()->result_array();
+        array_push($ledger_wise_statement,$journal_statement);
+
+        $contra_statement = $this->db->select('contra_voucher_entries.id,
+                                                   contra_voucher_entries.voucher_date,
+                                                   contra_voucher_entries.narration,
+                                                   contra_voucher_entries.voucher_type,
+                                                   cv.ledger_id,
+                                                   SUM(cv.debit_amount) as debit_amount,
+                                                   SUM(cv.credit_amount) as credit_amount')
+            ->from('contra_voucher_entries_details as cv')
+            ->join('contra_voucher_entries','contra_voucher_entries.id = cv.voucher_entries_id')
+            ->where("cv.ledger_id", $ledger_id)
+            ->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+            ->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+            ->group_by('contra_voucher_entries.voucher_date')
+            ->group_by('contra_voucher_entries.id')
+            ->get()->result_array();
+        array_push($ledger_wise_statement,$contra_statement);
+
+        return $ledger_wise_statement;
     }
 
 

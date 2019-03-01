@@ -33,7 +33,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Dashboard';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         //$data->profile_image = $this->admin_model->get_profile_image($_SESSION['user_id']);
 
         $this->template->load('admin/template_dashboard', 'admin/dashboard', $data);
@@ -210,7 +210,7 @@ class Admin extends MY_Controller
         $data->title = 'Char Of Account';
         $data->username = $_SESSION['username'];
         $this->load->library('form_validation');
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->account_main_chart = $this->admin_model->get_all_base_chart();
         $this->template->load('admin/template_dashboard', 'admin/group_list_of_account', $data);
     }
@@ -228,7 +228,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'create Group';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['create_group'])) {
             $config = array(
@@ -307,7 +307,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Edit Group';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->get_editable_group = $this->admin_model->getEditGroupData($group_id);
         $data->assets_group = $this->admin_model->getAllAssetsParents();
         $data->assets_sub_childs = $this->admin_model->getAllAssetsSubChild();
@@ -359,7 +359,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Group';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['update_group'])) {
             $config = array(
@@ -403,7 +403,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create Ledger';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         if (isset($_POST['create_ledger'])) {
             $config = array(
@@ -458,7 +458,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Ledger List';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->get_all_ledger = $this->admin_model->getAllLedgerAccount($ledger_id);
         $this->template->load('admin/template_dashboard', 'admin/ledger_list', $data);
     }
@@ -476,7 +476,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Ledger Account';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $data->all_accounts = $this->admin_model->getAllLedger();
         if (isset($_POST['update_ledger'])) {
@@ -650,7 +650,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Sub Chart of Account';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->sub_groups = $this->admin_model->getAllSubGroups($id);
         $this->template->load('admin/template_dashboard', 'admin/sub_group_of_account', $data);
     }
@@ -666,7 +666,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create pay mode';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -705,7 +705,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Create Bank';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $config = array(
@@ -833,7 +833,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Payment Voucher';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -915,7 +915,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Receive Voucher';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -997,7 +997,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Journal Voucher';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -1079,7 +1079,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Contra Voucher';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->all_paymode_names = $this->admin_model->getAllPayModeName();
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
@@ -1169,7 +1169,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Truck';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -1215,6 +1215,7 @@ class Admin extends MY_Controller
                     'member_id' => $post['truck_member'],
                     'truck_type' => $post['truck_type'],
                     'inclusion_date' => $inclusion_date,
+                    'remark' => $post['remark'],
                     'created_by' => $_SESSION['username'],
                 );
                 $insert = $this->admin_model->addTruck($insert_data);
@@ -1281,11 +1282,14 @@ class Admin extends MY_Controller
                     <input type="text" id="inclusion_date" name="inclusion_date" class="form-control dateinput" required="required" value="' . $result[0]['inclusion_date'] . '">
                 </div>
             </div>
-            <button type="submit" name="edit_truck" class="btn btn-success pull-right" id="edit_truck" title="Add Truck">Update</button>';
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="remark">Remark :</label><br>
+                    <textarea class="form-control" id="remark" name="remark">' . $result[0]["remark"] . '</textarea>
+                </div>
+            </div>
+            <button type="submit" name="edit_truck" class="btn btn-success pull-right" id="edit_truck" title="Edit Truck">Update</button>';
             }
-            // echo'<pre>';
-            // print_r($result);
-
         }
     }
 
@@ -1299,13 +1303,13 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Update Truck';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
                 'field' => 'truck_no',
                 'label' => 'Truck No',
-                'rules' => 'requiget_truck_typered',
+                'rules' => 'required',
                 'errors' => array(
                     'required' => 'You must provide %s',
                 ),
@@ -1333,14 +1337,12 @@ class Admin extends MY_Controller
                 'errors' => array(
                     'required' => 'You must provide %s',
                 ),
-            ),
+            )
         );
         $this->form_validation->set_rules($config);
         if ($this->form_validation->run() == true) {
             if (isset($_POST['edit_truck'])) {
                 $post = $this->input->post();
-                //     echo'<pre>';
-                // print_r($post);
                 $inclusion_date_row = $post['inclusion_date'];
                 $inclusion_date = date('Y-m-d', strtotime($inclusion_date_row));
                 $update_data = array(
@@ -1348,13 +1350,16 @@ class Admin extends MY_Controller
                     'member_id' => $post['truck_member'],
                     'truck_type' => $post['truck_type'],
                     'inclusion_date' => $inclusion_date,
+                    'remark' => $post['remark'],
                     'created_by' => $_SESSION['username'],
                 );
                 $update = $this->db->update('truck', $update_data, array('truck_tbl_id' => $post['truck_update_id']));
                 if ($update == true) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Update successfully');
+                    redirect('admin/addTruck');
                 } else {
                     $this->session->set_flashdata('error', '<strong>Failed!</strong> Update Failed');
+                    redirect('admin/addTruck');
                 }
             }
         }
@@ -1373,7 +1378,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Member';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $config = array(
             array(
@@ -1472,10 +1477,8 @@ class Admin extends MY_Controller
                 }
             }
         }
-
-        $data->all_member_account = $this->admin_model->getAllMemberAccount();
-        $data->all_truck = $this->admin_model->truckList();
         $data->member_list = $this->admin_model->memberList();
+        $data->all_member_account = $this->admin_model->getAllMemberAccount();
         $this->template->load('admin/template_dashboard', 'admin/member', $data);
     }
 
@@ -1523,7 +1526,7 @@ class Admin extends MY_Controller
 //                echo '</select>
 //                </div>
 //            </div>
-            echo '<div class="col-md-4">
+                echo '<div class="col-md-4">
                 <div class="form-group">
                     <label for="member_no">Member No: <span style="color:red;">*</span></label><br>
                     <input type="text" id="member_no" name="member_no" class="form-control" required="required" value="' . $update_data[0]['member_no'] . '">  
@@ -1652,7 +1655,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Member Truck Entry';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->member_voucher_no = $this->db->select('member_truck_voucher_id')->from('member_truck_voucher_master')->get()->num_rows();
         $this->load->library('form_validation');
         if (isset($_POST['save_member_voucher'])) {
@@ -1718,7 +1721,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Non Member Truck Entry';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $data->non_member_voucher_no = $this->db->select('non_member_voucher_id')->from('non_member_truck_voucher')->get()->num_rows();
         $data->username = $_SESSION['username'];
         $this->load->library('form_validation');
@@ -1752,29 +1755,30 @@ class Admin extends MY_Controller
      * Update company info
      * access public
      * return object
-    */
-    public function updateCompanyInfo(){
+     */
+    public function updateCompanyInfo()
+    {
         $data = new stdClass();
         $data->title = 'Update Company Information';
         $data->username = $_SESSION['username'];
-        $data->company_info = $this->db->get_where('company_information', array('user_id'=>$_SESSION['user_id']))->result_array();
+        $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
 //        echo '<pre>';
 //        print_r($data->company_info);
-        if(empty($data->company_info)){
-            if(isset($_POST['save_company_info'])){
+        if (empty($data->memberTruckVouchercompany_info)) {
+            if (isset($_POST['save_company_info'])) {
                 $post = $this->input->post();
-                $comapny_data =array(
-                    'user_id'=> $_SESSION['user_id'],
-                    'company_name'=> $post['name_of_company'],
-                    'business_type'=> $post['name_of_business'],
-                    'registrated_address'=> $post['registrated_address'],
-                    'country_of_origin'=> $post['country_of_origin'],
-                    'telephone_no'=> $post['telephone_no'],
-                    'fax_no'=> $post['fax_no'],
-                    'mobile_no'=> $post['mobile_no'],
-                    'web_address'=> $post['web_address'],
-                    'email'=> $post['email'],
-                    'glance_description'=> $post['at_glance_brief_description']
+                $comapny_data = array(
+                    'user_id' => $_SESSION['user_id'],
+                    'company_name' => $post['name_of_company'],
+                    'business_type' => $post['name_of_business'],
+                    'registrated_address' => $post['registrated_address'],
+                    'country_of_origin' => $post['country_of_origin'],
+                    'telephone_no' => $post['telephone_no'],
+                    'fax_no' => $post['fax_no'],
+                    'mobile_no' => $post['mobile_no'],
+                    'web_address' => $post['web_address'],
+                    'email' => $post['email'],
+                    'glance_description' => $post['at_glance_brief_description']
                 );
                 $result = $this->db->insert('company_information', $comapny_data);
                 if ($result) {
@@ -1795,22 +1799,22 @@ class Admin extends MY_Controller
 //                        </span>Company Information Updated Failed</div>';
 //            }
             }
-        }else{
-            if(isset($_POST['update_company_info'])){
+        } else {
+            if (isset($_POST['update_company_info'])) {
                 $post = $this->input->post();
-                $comapny_data =array(
-                    'company_name'=> $post['name_of_company'],
-                    'business_type'=> $post['name_of_business'],
-                    'registrated_address'=> $post['registrated_address'],
-                    'country_of_origin'=> $post['country_of_origin'],
-                    'telephone_no'=> $post['telephone_no'],
-                    'fax_no'=> $post['fax_no'],
-                    'mobile_no'=> $post['mobile_no'],
-                    'web_address'=> $post['web_address'],
-                    'email'=> $post['email'],
-                    'glance_description'=> $post['at_glance_brief_description']
+                $comapny_data = array(
+                    'company_name' => $post['name_of_company'],
+                    'business_type' => $post['name_of_business'],
+                    'registrated_address' => $post['registrated_address'],
+                    'country_of_origin' => $post['country_of_origin'],
+                    'telephone_no' => $post['telephone_no'],
+                    'fax_no' => $post['fax_no'],
+                    'mobile_no' => $post['mobile_no'],
+                    'web_address' => $post['web_address'],
+                    'email' => $post['email'],
+                    'glance_description' => $post['at_glance_brief_description']
                 );
-                $result = $this->db->update('company_information', $comapny_data, array('user_id'=> $_SESSION['user_id']));
+                $result = $this->db->update('company_information', $comapny_data, array('user_id' => $_SESSION['user_id']));
                 if ($result) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Company Information Updated Successfully.');
                     redirect('admin/updateCompanyInfo');
@@ -1834,7 +1838,478 @@ class Admin extends MY_Controller
         $this->template->load('admin/template_dashboard', 'admin/updateCompanyInfo', $data);
     }
 
+    /*=======================Truck report==================================*/
+    /**
+     * Truck Member report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function truckMemberReport()
+    {
+        $data = new stdClass();
+        $data->title = 'Truck Member Report';
+        $data->username = $_SESSION['username'];
+        $data->truck_member_reports = $this->admin_model->truckMemberReport();
+//        echo '<pre>';
+//        print_r($data->truck_member_reports);
+        $this->template->load('admin/template_dashboard', 'admin/Truck Report/truck_member_report', $data);
+    }
+
+    /**
+     * Truck statement member wise report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function truckStatementMemberwise()
+    {
+        $data = new stdClass();
+        $data->title = 'Truck Statement Report Memberwise';
+        $data->username = $_SESSION['username'];
+        $data->member_list = $this->admin_model->memberList();
+        $this->template->load('admin/template_dashboard', 'admin/Truck Report/truck_statement_memberwise', $data);
+    }
+
+    /**
+     * Get Truck statement member wise report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckStatementMemberwise()
+    {
+        if (isset($_POST['start_date'])) {
+            $post = $this->input->post();
+            if (!empty($post)) {
+                $start_date = date('Y-m-d', strtotime($post['start_date']));
+                $end_date = date('Y-m-d', strtotime($post['end_date']));
+                $member_id = $post['member_id'];
+                $truck_statement_memberwises = $this->admin_model->truckStatementMemberwise($start_date, $end_date,$member_id);
+                if (!empty($truck_statement_memberwises)) {
+                    $i = 1;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Member Name & No</th>
+                                <th>Type A</th>
+                                <th>Type B</th>
+                                <th>Total Truck</th>
+                                <th>Total Amount</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>';
+                    $total_big = 0;
+                    $total_mini = 0;
+                    foreach ($truck_statement_memberwises as $truck_statement_memberwise) {
+                        $total_big += $truck_statement_memberwise["big"];
+                        $total_mini += $truck_statement_memberwise["mini"];
+                        echo '
+                            <tr>
+                                <td>' . $i . '</td>
+                                <td>' . $truck_statement_memberwise["ledger_name"] . '(' . $truck_statement_memberwise["member_no"] . ')</td>
+                                <td style="text-align: right">' . $truck_statement_memberwise["big"] . '</td>
+                                <td style="text-align: right">' . $truck_statement_memberwise["mini"] . '</td>
+                                <td style="text-align: right">' . floor($truck_statement_memberwise["big"] + $truck_statement_memberwise["mini"]) . '</td>
+                                <td style="text-align: right">' . ($truck_statement_memberwise["big"] + $truck_statement_memberwise["mini"]) * 100 . '</td>
+                                <td>' . $truck_statement_memberwise["remark"] . '</td>
+                                <td><button type="button" class="btn btn-primary m_truck_details" m_truck_id="'.$truck_statement_memberwise["truck_member_id"].'" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fa fa-eye"></i></button></td>
+                            </tr>';
+                        $i++;
+                    }
+
+                    echo '</tbody>
+                          <tfoot>
+                            <tr>
+                                <td></td>
+                                <td style="text-align: right">Grand Total</td>
+                                <td style="text-align: right">'.$total_big.'</td>
+                                <td style="text-align: right">'.$total_mini.'</td>
+                                <td style="text-align: right">'.($total_big + $total_mini).'</td>
+                                <td style="text-align: right">'.($total_big + $total_mini) *100 .'</td>
+                            </tr>
+                          </tfoot>';
+
+                }else{
+                    echo '<tr><td>Do not found any data.</td></tr>';
+                }
+            }else{
+                echo '<tr><td>Do not found any data.</td></tr>';
+            }
+        }else{
+            echo '<tr><td>Do not found any data.</td></tr>';
+        }
+    }
+
+    /**
+     * Get member wise truck details
+     * access public
+     * return object
+     * parameter member id
+     */
+    public function getMemberwiseTruckDetails()
+    {
+        if (isset($_POST['member_id'])) {
+            $post = $this->input->post();
+            if (!empty($post)) {
+                $this->db->select('
+                            member_truck_voucher_details.entry_date,
+                            member_truck_voucher_details.amount,
+                            member_truck_voucher_details.created_by,
+                            truck.truck_number');
+                $this->db->from('member_truck_voucher_details');
+                $this->db->join('truck', 'member_truck_voucher_details.truck_id = truck.truck_tbl_id');
+                $this->db->join('member', 'member.account_id = member_truck_voucher_details.truck_member_id');
+                $this->db->where('member_truck_voucher_details.truck_member_id', $post['member_id']);
+//                $this->db->group_by('member_truck_voucher_details.truck_id');
+                $memberwise_details = $this->db->get()->result_array();
+//                echo '<pre>';
+//                print_r($memberwise_details);
+                if(!empty($memberwise_details)){
+                    $i = 1;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Truck Number</th>
+                                <th>Entry Date</th>
+                                <th>Amount</th>
+                                <th>Creatd By</th>
+                            </tr>
+                        </thead>
+                        <tbody>';
+                    foreach ($memberwise_details as $m_detail){
+                        echo '
+                            <tr>
+                                <td>' . $i . '</td>                                
+                                <td>' . $m_detail["truck_number"] . '</td>                                
+                                <td>' . $m_detail["entry_date"] . '</td>                                
+                                <td>' . $m_detail["amount"] . '</td>                                
+                                <td>' . $m_detail["created_by"] . '</td>                                
+                            </tr>';
+                        $i++;
+                    }
+                    echo '</tbody>';
+                }
+            }
+        }
+    }
+
+    /**
+     * Truck statement details report
+     * access public
+     * return object
+     * parameter date range
+     */
+
+    public function truckStatementDetails()
+    {
+        $data = new stdClass();
+        $data->title = 'Truck Statement Details Report';
+        $data->username = $_SESSION['username'];
+        $this->template->load('admin/template_dashboard', 'admin/Truck Report/truck_statement_details', $data);
+    }
+
+    /**
+     * Get Truck statement details report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckStatementDetails()
+    {
+        if(isset($_POST['start_date'])){
+            $post = $this->input->post();
+            if (!empty($post)) {
+                //$daterange = explode('-', $post['daterange']);
+                $start_date = date('Y-m-d', strtotime($post['start_date']));
+                $end_date = date('Y-m-d', strtotime($post['end_date']));
+                $truck_income_statement = $this->admin_model->getTruckIncomeStatement($start_date, $end_date);
+//                echo '<pre>';
+//                print_r($truck_income_statement);
+                if (!empty($truck_income_statement)) {
+                    $i = 1;
+                    $total =0;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Tran Date</th>
+                                <th>Description</th>
+                                <th>Total Truck</th>
+                                <th>Total Truck</th>
+                            </tr>
+                            </thead>
+                            <tbody>';
+                    foreach ($truck_income_statement as $truck_inc_statement) {
+                        $total+= $truck_inc_statement["total"];
+                        echo '<tr>
+                                <td>' . $i . '</td>
+                                <td>' . $truck_inc_statement["voucher_date"].'</td>
+                                <td>' . $truck_inc_statement["narration"] . '</td>
+                                <td style="text-align: right">' . ($truck_inc_statement["total"])/100 . '</td>
+                                <td style="text-align: right">' . $truck_inc_statement["total"] . '</td>                                
+                            </tr>';
+                        $i++;
+                    }
+                    echo '</tbody><tfoot>
+                            <tr>
+                                <td style="text-align: right" colspan="3">Grand Total</td>
+                                <td style="text-align: right">'.($total/100).'</td>
+                                <td style="text-align: right">'.$total.'</td>
+                            </tr>
+                          </tfoot>';
+                }else{
+                    echo '<tr><td>Do not found any data.</td></tr>';
+                }
+            }else{
+                echo '<tr><td>Do not found any data.</td></tr>';
+            }
+        }else{
+            echo '<tr><td>Do not found any data.</td></tr>';
+        }
+    }
+
+    /**
+     * Truck income statement report
+     * access public
+     * return object
+     * parameter date range
+     */
+
+    public function truckIncomeStatement()
+    {
+        $data = new stdClass();
+        $data->title = 'Truck Income Statement Report';
+        $data->username = $_SESSION['username'];
+        $this->template->load('admin/template_dashboard', 'admin/Truck Report/truck_income_statement', $data);
+    }
+
+    /**
+     * Get Truck income statement report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckIncomeStatement()
+    {
+        if(isset($_POST['start_date'])){
+            $post = $this->input->post();
+            if (!empty($post)) {
+                //$daterange = explode('-', $post['daterange']);
+                $start_date = date('Y-m-d', strtotime($post['start_date']));
+                $end_date = date('Y-m-d', strtotime($post['end_date']));
+                $truck_income_statement = $this->admin_model->getTruckIncomeStatement($start_date, $end_date);
+//                echo '<pre>';
+//                print_r($truck_income_statement);
+                if (!empty($truck_income_statement)) {
+                    $i = 1;
+                    $total =0;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Tran Date</th>
+                                <th>Description</th>
+                                <th>Deposited Voucher No</th>
+                                <th>Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>';
+                    foreach ($truck_income_statement as $truck_inc_statement) {
+                        $total+= $truck_inc_statement["total"];
+                        echo '<tr>
+                                <td>' . $i . '</td>
+                                <td>' . $truck_inc_statement["voucher_date"].'</td>
+                                <td>' . $truck_inc_statement["narration"] . '</td>
+                                <td style="text-align: right">' . $truck_inc_statement["id"] . '</td>
+                                <td style="text-align: right">' . $truck_inc_statement["total"] . '</td>                                
+                            </tr>';
+                        $i++;
+                    }
+                    echo '</tbody><tfoot>
+                            <tr>
+                                <td style="text-align: right" colspan="4">Grand Total</td>
+                                <td style="text-align: right">'.$total.'</td>
+                            </tr>
+                          </tfoot>';
+                }else{
+                    echo '<tr><td>Do not found any data.</td></tr>';
+                }
+            }else{
+                echo '<tr><td>Do not found any data.</td></tr>';
+            }
+        }else{
+            echo '<tr><td>Do not found any data.</td></tr>';
+        }
+    }
+
+    /**
+     * Truck statement non memberwise
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function truckStatementNonMemberwise()
+    {
+        $data = new stdClass();
+        $data->title = 'Truck Statement Non Memberwise';
+        $data->username = $_SESSION['username'];
+        $this->template->load('admin/template_dashboard', 'admin/Truck Report/truck_statement_non_memberwise', $data);
+    }
+
+    /**
+     * Get Truck income statement report
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function getTruckStatementNonMemberwise()
+    {
+        if(isset($_POST['start_date'])){
+            $post = $this->input->post();
+            if (!empty($post)) {
+                //$daterange = explode('-', $post['daterange']);
+                $start_date = date('Y-m-d', strtotime($post['start_date']));
+                $end_date = date('Y-m-d', strtotime($post['end_date']));
+                $truck_statement_report_non_memberwise = $this->admin_model->getTruckStatementNonMemberwise($start_date, $end_date);
+//                echo '<pre>';
+//                print_r($truck_income_statement);
+                if (!empty($truck_statement_report_non_memberwise)) {
+                    $i = 1;
+                    $total =0;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Entry Date</th>
+                                <th>Created By</th>
+                                <th>Remark</th>
+                                <th>Total Truck</th>
+                                <th>Total Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>';
+                    foreach ($truck_statement_report_non_memberwise as $truck_statement_non_mem) {
+                        $total+= $truck_statement_non_mem["total_amount"];
+                        echo '<tr>
+                                <td>' . $i . '</td>
+                                <td>' . $truck_statement_non_mem["entry_date"].'</td>
+                                <td>' . $truck_statement_non_mem["created_by"] . '</td>                                
+                                <td>' . $truck_statement_non_mem["note"] . '</td>                                
+                                <td style="text-align: right">' . $truck_statement_non_mem["truck_count"] . '</td>
+                                <td style="text-align: right">' . $truck_statement_non_mem["total_amount"] . '</td>
+                            </tr>';
+                        $i++;
+                    }
+                    echo '</tbody><tfoot>
+                            <tr>
+                                <td style="text-align: right" colspan="4">Grand Total</td>
+                                <td style="text-align: right">'.($total/100).'</td>
+                                <td style="text-align: right">'.$total.'</td>
+                            </tr>
+                          </tfoot>';
+                }else{
+                    echo '<tr><td>Do not found any data.</td></tr>';
+                }
+            }else{
+                echo '<tr><td>Do not found any data.</td></tr>';
+            }
+        }else{
+            echo '<tr><td>Do not found any data.</td></tr>';
+        }
+    }
+
+    /**
+     * Truck statement non memberwise
+     * access public
+     * return object
+     * parameter date range
+     */
+    public function ledgerWiseAccountStatement()
+    {
+        $data = new stdClass();
+        $data->title = 'Ledger Wise Account Statement';
+        $data->username = $_SESSION['username'];
+        $data->all_ledger = $this->db->select('id,ledger_name')->from('ledgers')->get()->result_array();
+        $this->template->load('admin/template_dashboard', 'admin/Account Reports/ledger_wise_account_statement', $data);
+    }
+
+    /**
+     * Get Ledger Wise Account Statement report
+     * access public
+     * return object
+     * parameter date range and ledger id
+     */
+    public function getLedgerWiseAccountStatement()
+    {
+        if(isset($_POST['start_date'])){
+            $post = $this->input->post();
+            if (!empty($post['start_date']) && !empty($post['end_date']) && !empty($post['ledger_id']) && $post['ledger_id'] != 'Select Ledger') {
+                $start_date = date('Y-m-d', strtotime($post['start_date']));
+                $end_date = date('Y-m-d', strtotime($post['end_date']));
+                $ledger_id = $post['ledger_id'];
+                $ledger_wise_account_statement = $this->admin_model->getLedgerWiseAccountStatement($start_date, $end_date, $ledger_id);
+//                echo '<pre>';
+//                print_r($ledger_wise_account_statement);die();
+                if (!empty($ledger_wise_account_statement)) {
+                    $i = 1;
+                    $total =0;
+                    echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Date</th>
+                                <th>Voucher No</th>
+                                <th>Type</th>
+                                <th>Debit Amount</th>
+                                <th>Credit Amount</th>
+                                <th>Balance</th>
+                                <th>Notes</th>
+                            </tr>
+                            </thead>
+                            <tbody>';
+                    $debit_total = 0;
+                    $credit_total = 0;
+                    foreach (call_user_func_array('array_merge', $ledger_wise_account_statement) as $val) {
+                        $debit_total+=$val["debit_amount"];
+                        $credit_total+=$val["credit_amount"];
+                        echo '<tr>
+                                <td>' . $i . '</td>
+                                <td>' . $val["voucher_date"].'</td>
+                                <td>' . $val["id"] . '</td>';
+                                if($val["voucher_type"] == 'RV'){
+                                    echo ' <td>Receive</td>;';
+                                }elseif($val["voucher_type"] == 'PV'){
+                                    echo ' <td>Payment</td>;';
+                                }elseif($val["voucher_type"] == 'JV'){
+                                    echo ' <td>Journal</td>;';
+                                }elseif($val["voucher_type"] == 'CV'){
+                                    echo ' <td>Contra</td>;';
+                                }
+                                echo'                              
+                                <td style="text-align: right">' . $val["debit_amount"] . '</td>
+                                <td style="text-align: right">' . $val["credit_amount"] . '</td>
+                                <td>' . $val["balance"].'</td>
+                                <td>' . $val["narration"].'</td>
+                            </tr>';
+                        $i++;
+                    }
+                    echo '</tbody><tfoot>
+                            <tr>
+                                <td style="text-align: right" colspan="4">Grand Total</td>
+                                <td style="text-align: right">'.$debit_total.'</td>
+                                <td style="text-align: right">'.$credit_total.'</td>
+                            </tr>
+                          </tfoot>';
+                }else{
+                    echo '<tr><td>Do not found any data.</td></tr>';
+                }
+            }else{
+                echo '<tr><td>Do not found any data.</td></tr>';
+            }
+        }else{
+            echo '<tr><td>Do not found any data.</td></tr>';
+        }
+    }
+
 }
 
-ob_end_clean()
-?>
+ob_end_clean();

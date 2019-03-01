@@ -38,10 +38,12 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Member No</th>
+                                    <th>Member Name</th>
                                     <th>Truck Number</th>
-                                    <th>Member</th>
                                     <th>Truck Type</th>
                                     <th>Inclusion Date</th>
+                                    <th>Remark</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -50,15 +52,17 @@
                                     <?php if ($truck_list == !null): $i = 1;?>
 	                                        <?php foreach ($truck_list as $truck): ?>
 	                                            <tr>
-	                                                <td><?php echo $i;$i++ ?></td>
-	                                                <td><?php echo $truck['truck_number'] ?> </td>
-	                                                <td><?php echo $truck['ledger_name'] ?> </td>
-	                                                <td><?php echo $truck['truck_type'] ?></td>
-	                                                <td><?php echo $truck['inclusion_date'] ?></td>
+	                                                <td width="5%"><?php echo $i;$i++ ?></td>
+	                                                <td width="5%"><?php echo $truck['member_no'] ?> </td>
+	                                                <td width="8%"><?php echo $truck['ledger_name'] ?> </td>
+	                                                <td width="8%"><?php echo $truck['truck_number'] ?> </td>
+	                                                <td width="5%"><?php echo $truck['truck_type'] ?></td>
+	                                                <td width="8%"><?php echo $truck['inclusion_date'] ?></td>
+	                                                <td width="5%"><?php echo $truck['remark'] ?></td>
 	                                                <td>
-	                                                    <button type="button"  data-toggle="modal" data-target="#editTruck" id="edit_Truck" edit_id="<?=$truck['truck_tbl_id']?>" class="btn btn-sm btn-info"> <i class="fa fa-pencil-square" aria-hidden="true"></i> Edit</button>
-	                                                    <button type="button" onclick="viewSupplier(<?=$truck['truck_tbl_id']?>);" class="btn btn-sm btn-primary"> <i class="fa fa-eye" aria-hidden="true"></i> View</button>
-	                                                    <button type="button" onclick="delSupplier(this, <?=$truck['truck_tbl_id']?>)" class="btn btn-sm btn-danger" style="margin-left: 5px;"><i class="fa fa-trash-o" aria-hidden="true" title="Delete Supplier "> Delete</i></button>
+	                                                    <button type="button"  data-toggle="modal" data-target="#editTruck" id="edit_Truck" edit_id="<?=$truck['truck_tbl_id']?>" class="btn btn-sm btn-info"> <i class="fa fa-pencil-square" aria-hidden="true"></i></button>
+	                                                    <button type="button" onclick="viewSupplier(<?=$truck['truck_tbl_id']?>);" class="btn btn-sm btn-primary"> <i class="fa fa-eye" aria-hidden="true"></i></button>
+	                                                    <button type="button" onclick="delSupplier(this, <?=$truck['truck_tbl_id']?>)" class="btn btn-sm btn-danger" style="margin-left: 5px;"><i class="fa fa-trash-o" aria-hidden="true" title="Delete Supplier "></i></button>
 	                                                </td>
 	                                            </tr>
 	                                        <?php endforeach;?>
@@ -121,8 +125,14 @@
                                         <input type="text" id="inclusion_date" name="inclusion_date" class="form-control dateinput" required="required">
                                     </div>
                                 </div>
-                                <button type="submit" name="add_truck" class="btn btn-success pull-right" id="add_truck" title="Add Truck">Add</button>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="remark">Remark :</label><br>
+                                        <textarea class="form-control" id="remark" name="remark"></textarea>
+                                    </div>
+                                </div>
                             </div>
+                            <button type="submit" name="add_truck" class="btn btn-success pull-right" id="add_truck" title="Add Truck">Add</button>
                         </form>
                     </div>
                 </div>
@@ -156,8 +166,8 @@
 
 <script>
     $(document).ready(function () {
-        // $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
-        // $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
+//         $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
+//         $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
 
     });
 
