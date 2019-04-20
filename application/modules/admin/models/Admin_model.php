@@ -1068,7 +1068,7 @@ class Admin_model extends CI_Model
             'created_by' => $_SESSION['username']
         );
         //update member truck fee
-        $truck_member_exits_balance_data = $this->db->select('balance, credit')->from('ledgers')->where('id', 19)->get()->result_array();
+        $truck_member_exits_balance_data = $this->db->select('po_balance,debit,credit,balance')->from('ledgers')->where('id', 19)->get()->result_array();
         $updated_balance = $truck_member_exits_balance_data[0]['balance'] + $post['total_amount'];
         $updated_credit = $truck_member_exits_balance_data[0]['credit'] + $post['total_amount'];
         $this->db->update('ledgers', array('balance' => $updated_balance, 'credit' => $updated_credit), array('id' => 19));

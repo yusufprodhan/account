@@ -249,7 +249,7 @@
                 <!-- footer content -->
                 <footer>
                     <div class="pull-right">
-                        Developed by <a href="http://hdyit.com/">hdyit.com</a>
+                        Developed by <a href="http://firstitsolution.com/">Firstit Solution</a>
                     </div>
                     <div class="clearfix"></div>
                 </footer>

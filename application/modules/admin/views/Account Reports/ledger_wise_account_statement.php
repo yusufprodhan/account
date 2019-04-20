@@ -111,34 +111,34 @@
                 data: { start_date: start_date,end_date:end_date,ledger_id:ledger_id},
                 success: function (data) {
                     $(document).find('.data_table').html(data);
-//                    $(document).find('.data_table').DataTable({
-//                        dom: 'Bfrtip',
-//                        "bRetrieve": true,
-//                        "bDestroy": true,
-//                        "bPaginate":true,
-//                        "lengthMenu": [[25, 50, 100, 500, -1], [25, 50, 100, 500, "All"]],
-//                        buttons: [
-//                            {
-//                                extend: 'csv',
-//                                footer: true,
-//                                filename: 'Truck Statement Report Memberwise'
-//                            },
-//                            {
-//                                extend: 'excel',
-//                                footer: true,
-//                                filename: 'Truck Statement Report Memberwise'
-//                            },
-//                            {
-//                                extend: 'print',
-//                                footer: true,
-//                                filename: 'Truck Statement Report Memberwise'
-//                            },
-//                            {
-//                                extend: 'pageLength',
-//                                footer: true
-//                            }
-//                        ],
-//                    });
+                    $(document).find('.data_table').DataTable({
+                        dom: 'Bfrtip',
+                        "bRetrieve": true,
+                        "bDestroy": true,
+                        "bPaginate":true,
+                        "lengthMenu": [[25, 50, 100, 500, -1], [25, 50, 100, 500, "All"]],
+                        buttons: [
+                            {
+                                extend: 'csv',
+                                footer: true,
+                                filename: 'Truck Statement Report Memberwise'
+                            },
+                            {
+                                extend: 'excel',
+                                footer: true,
+                                filename: 'Truck Statement Report Memberwise'
+                            },
+                            {
+                                extend: 'print',
+                                footer: true,
+                                filename: 'Truck Statement Report Memberwise'
+                            },
+                            {
+                                extend: 'pageLength',
+                                footer: true
+                            }
+                        ],
+                    });
                 }
             });
         }else{
