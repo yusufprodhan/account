@@ -106,7 +106,6 @@
                                             <label for="balance_type" class=" col-md-2 col-sm-12 col-xs-12">Balance Type</label>
                                             <div class="col-md-10 col-sm-12 col-xs-12">
                                                 <select class="form-control select2" name="balance_type" id="balance_type">
-                                                    <option></option>
                                                     <option value="C">Credit</option>
                                                     <option value="D">Debit</option>
                                                 </select>
@@ -124,8 +123,8 @@
                                                 <textarea class="form-control" name="note" id="note"></textarea>
                                             </div>
                                         </div>
-                                        <button type="submit" name="create_ledger" class="btn btn-primary" >Create</button>
-                                        <button type="button" onclick="window.location.href = '<?php echo site_url() ?>admin/groupListOfAccount';" class="btn btn-info" >Back</button>
+										<button type="button" onclick="window.location.href = '<?php echo site_url() ?>admin/groupListOfAccount';" class="btn btn-info" >Back</button>
+										<button type="submit" class="btn btn-primary" >Create</button>
                                     </div>
                                 </form>
                             </div>
@@ -151,15 +150,15 @@
             placeholder: "Select Balance Type"
         });
 
-        $(document).on('change keyup', '.prevent', function () {
-            var numchange = $(this).val().replace(/[^0-9.]/g, '');
-            numchange = numchange.replace(/\.(?=.*\.)/, '');
-            $(this).val(numchange);
-        });
-
-
-        $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
+		$('.alert-success').delay(2000).hide(300).css({'color': 'green'});
         $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
 
-    })
+    });
+
+    //for prevent text in number in text input
+	$(document).on('change keyup', '.prevent', function () {
+		var numchange = $(this).val().replace(/[^0-9.]/g, '');
+		numchange = numchange.replace(/\.(?=.*\.)/, '');
+		$(this).val(numchange);
+	});
 </script>

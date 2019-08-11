@@ -22,7 +22,7 @@ class Admin_model extends CI_Model
         $this->load->database();
     }
 
-    /**
+    /***
      * get_profile_image method
      *
      * select the existing image file from database
@@ -408,27 +408,48 @@ class Admin_model extends CI_Model
      * @return bool
      */
 
-    public function insertLedger($ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $created_by)
+    public function insertLedger($data)
     {
-        $this->db->trans_begin();
-        $insert_data = array(
-            'group_id' => $ledger_parent,
-            'ledger_name' => $ledger_name,
-            'op_balance' => $opening_balance,
-            'balance' => $opening_balance,
-            'balance_type' => $balance_type,
-            'note ' => $note,
-            'create_by ' => $created_by,
-            'status' => 'active'
-        );
-        $result = $this->db->insert('ledgers', $insert_data);
+		$check_exists = $this->db->get_where('ledgers',array('ledger_name'=>$data['ledger_name']));
+		if($check_exists->num_rows() == 0){
+			if($data['balance_type'] == 'C'){
+				$insert_data = array(
+					'group_id' => $data['ledger_parent'],
+					'ledger_name' => $data['ledger_name'],
+					'op_balance' => $data['opening_balance'],
+					'credit' => $data['opening_balance'],
+					'balance' => $data['opening_balance'],
+					'balance_type' => $data['balance_type'],
+					'note ' => $data['note'],
+					'create_by ' => $_SESSION['username'],
+					'status' => 'active'
+				);
+			}elseif ($data['balance_type'] == 'D'){
+				$insert_data = array(
+					'group_id' => $data['ledger_parent'],
+					'ledger_name' => $data['ledger_name'],
+					'op_balance' => $data['opening_balance'],
+					'debit' => $data['opening_balance'],
+					'balance' => $data['opening_balance'],
+					'balance_type' => $data['balance_type'],
+					'note ' => $data['note'],
+					'create_by ' => $_SESSION['username'],
+					'status' => 'active'
+				);
 
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+			}
+
+        $result = $this->db->insert('ledgers', $insert_data);
+			if($result){
+				return true;
+			}else{
+				return false;
+			}
+
+		}else{
+			return false;
+		}
+        
     }
 
     /*
@@ -437,27 +458,49 @@ class Admin_model extends CI_Model
      * @return bool
      */
 
-    public function updateLedger($ledger_id, $ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $updated_by)
+    public function updateLedger($data)
     {
-        $this->db->trans_begin();
-        $insert_data = array(
-            'group_id' => $ledger_parent,
-            'ledger_name' => $ledger_name,
-            'op_balance' => $opening_balance,
-            'balance' => $opening_balance,
-            'balance_type' => $balance_type,
-            'note ' => $note,
-            'create_by ' => $updated_by,
-            'status' => 'active'
-        );
-        $result = $this->db->insert('ledgers', $insert_data);
+    	if(!empty($data['ledger_id'])){
+			$check_exists = $this->db->get_where('ledgers',array('id'=>$data['ledger_id']))->row();
+			if($data['balance_type'] == 'C'){
+				$update_data = array(
+					'group_id' => $data['ledger_parent'],
+					'ledger_name' => $data['ledger_name'],
+					'op_balance' => $data['opening_balance'],
+					'credit' => $data['opening_balance'],
+					'balance' => $data['opening_balance'],
+					'balance_type' => $data['balance_type'],
+					'note ' => $data['note'],
+					'updated_by ' => $_SESSION['username'],
+					'status' => 'active'
+				);
+			}elseif ($data['balance_type'] == 'D'){
+				$update_data = array(
+					'group_id' => $data['ledger_parent'],
+					'ledger_name' => $data['ledger_name'],
+					'op_balance' => $data['opening_balance'],
+					'debit' => $data['opening_balance'],
+					'balance' => $data['opening_balance'],
+					'balance_type' => $data['balance_type'],
+					'note ' => $data['note'],
+					'updated_by ' => $_SESSION['username'],
+					'status' => 'active'
+				);
 
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+			}
+			if($check_exists->op_balance == $check_exists->balance){
+				$result = $this->db->update('ledgers', $update_data,array('id'=>$data['ledger_id']));
+				if($result){
+					return true;
+				}else{
+					return false;
+				}
+			}else{
+				return false;
+			}
+		}else{
+    		return false;
+		}
     }
 
     /*

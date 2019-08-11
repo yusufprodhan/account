@@ -230,7 +230,7 @@ class Admin extends MY_Controller
         $data->username = $_SESSION['username'];
         $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
-        if (isset($_POST['create_group'])) {
+        if (!empty($_POST['create_group'])) {
             $config = array(
                 array(
                     'field' => 'group_name',
@@ -405,7 +405,8 @@ class Admin extends MY_Controller
         $data->username = $_SESSION['username'];
         $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
-        if (isset($_POST['create_ledger'])) {
+        $post = $this->input->post();
+        if (!empty($post['ledger_name']) && !empty($post['ledger_name']) && !empty($post['ledger_name'])) {
             $config = array(
                 array(
                     'field' => 'ledger_name',
@@ -426,13 +427,7 @@ class Admin extends MY_Controller
             );
             $this->form_validation->set_rules($config);
             if ($this->form_validation->run() == true) {
-                $ledger_name = $this->input->post('ledger_name');
-                $ledger_parent = $this->input->post('ledger_parent');
-                $balance_type = $this->input->post('balance_type');
-                $opening_balance = $this->input->post('opening_balance');
-                $note = $this->input->post('note');
-                $created_by = $_SESSION['username'];
-                $result = $this->admin_model->insertLedger($ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $created_by);
+                $result = $this->admin_model->insertLedger($post);
                 if ($result == true) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Ledger added successfully');
                 } else {
@@ -479,7 +474,8 @@ class Admin extends MY_Controller
         $data->company_info = $this->db->get_where('company_information', array('user_id' => $_SESSION['user_id']))->result_array();
         $this->load->library('form_validation');
         $data->all_accounts = $this->admin_model->getAllLedger();
-        if (isset($_POST['update_ledger'])) {
+		$post = $this->input->post();
+        if (!empty($post)) {
             $config = array(
                 array(
                     'field' => 'ledger_name',
@@ -500,17 +496,7 @@ class Admin extends MY_Controller
             );
             $this->form_validation->set_rules($config);
             if ($this->form_validation->run() == true) {
-//                $inputs = $this->input->post();
-                //                echo '<pre>';
-                //                print_r($inputs);die();
-                $ledger_id = $this->input->post('ledger_id');
-                $ledger_name = $this->input->post('ledger_name');
-                $ledger_parent = $this->input->post('ledger_parent');
-                $balance_type = $this->input->post('balance_type');
-                $opening_balance = $this->input->post('opening_balance');
-                $note = $this->input->post('note');
-                $updated_by = $_SESSION['username'];
-                $result = $this->admin_model->updateLedger($ledger_id, $ledger_name, $ledger_parent, $balance_type, $opening_balance, $note, $updated_by);
+                $result = $this->admin_model->updateLedger($post);
                 if ($result == true) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Ledger Updated successfully');
                 } else {
@@ -533,7 +519,7 @@ class Admin extends MY_Controller
         $data = new stdClass();
         $data->title = 'Get Ledger Update Data';
         $data->username = $_SESSION['username'];
-        $data->assets_group = $this->admin_model->getAllAssetsParents();
+		$data->assets_group = $this->admin_model->getAllAssetsParents();
         $assets_group_data = $data->assets_group;
         $data->expenses_group = $this->admin_model->getAllExpensesParents();
         $expenses_group_data = $data->expenses_group;
@@ -541,10 +527,9 @@ class Admin extends MY_Controller
         $incomes_group_data = $data->incomes_group;
         $data->liabilities_group = $this->admin_model->getAllLiabilitiesParents();
         $liabilities_group_data = $data->liabilities_group;
-        if (isset($_POST['ledger'])) {
+        if (!empty($_POST['ledger'])) {
             $ledger_id = $this->input->post('ledger');
-            $ledger_update_data = $this->admin_model->getLedgerUpdateData($ledger_id);
-            //print_r($ledger_update_data);
+				$ledger_update_data = $this->admin_model->getLedgerUpdateData($ledger_id);
             echo '<div class="updata_data">
                     <div class="form-group row">
                         <label for="ledger_name" class="col-md-2 col-sm-12 col-xs-12">Name</label>
@@ -561,7 +546,7 @@ class Admin extends MY_Controller
             if (isset($assets_group_data)) {
                 if ($assets_group_data == !null) {
                     foreach ($assets_group_data as $asset_group_d) {
-                        echo '<option ' . (isset($asset_group_d) ? (($asset_group_d->id == $ledger_id) ? "selected" : "") : "") . ' value="' . $asset_group_d->id . '">' . $asset_group_d->group_name . '</option>';
+                        echo '<option ' . (isset($asset_group_d) ? (($asset_group_d->id == $ledger_update_data[0]->group_id) ? "selected" : "") : "") . ' value="' . $asset_group_d->id . '">' . $asset_group_d->group_name . '</option>';
                     }
                 }
             }
@@ -569,7 +554,7 @@ class Admin extends MY_Controller
             if (isset($expenses_group_data)) {
                 if ($expenses_group_data == !null) {
                     foreach ($expenses_group_data as $expenses_group_d) {
-                        echo '<option ' . (isset($expenses_group_d) ? (($expenses_group_d->id == $ledger_id) ? "selected" : "") : "") . ' value="' . $expenses_group_d->id . '">' . $expenses_group_d->group_name . '</option>';
+                        echo '<option ' . (isset($expenses_group_d) ? (($expenses_group_d->id == $ledger_update_data[0]->group_id) ? "selected" : "") : "") . ' value="' . $expenses_group_d->id . '">' . $expenses_group_d->group_name . '</option>';
                     }
                 }
             }
@@ -577,7 +562,7 @@ class Admin extends MY_Controller
             if (isset($incomes_group_data)) {
                 if ($incomes_group_data == !null) {
                     foreach ($incomes_group_data as $incomes_group_d) {
-                        echo '<option ' . (isset($incomes_group_d) ? (($incomes_group_d->id == $ledger_id) ? "selected" : "") : "") . ' value="' . $incomes_group_d->id . '">' . $incomes_group_d->group_name . '</option>';
+                        echo '<option ' . (isset($incomes_group_d) ? (($incomes_group_d->id == $ledger_update_data[0]->group_id) ? "selected" : "") : "") . ' value="' . $incomes_group_d->id . '">' . $incomes_group_d->group_name . '</option>';
                     }
                 }
             }
@@ -585,7 +570,7 @@ class Admin extends MY_Controller
             if (isset($liabilities_group_data)) {
                 if ($liabilities_group_data == !null) {
                     foreach ($liabilities_group_data as $liabilities_group_d) {
-                        echo '<option ' . (isset($liabilities_group_d) ? (($liabilities_group_d->id == $ledger_id) ? "selected" : "") : "") . ' value="' . $liabilities_group_d->id . '">' . $liabilities_group_d->group_name . '</option>';
+                        echo '<option ' . (isset($liabilities_group_d) ? (($liabilities_group_d->id == $ledger_update_data[0]->group_id) ? "selected" : "") : "") . ' value="' . $liabilities_group_d->id . '">' . $liabilities_group_d->group_name . '</option>';
                     }
                 }
             }
@@ -614,8 +599,8 @@ class Admin extends MY_Controller
                             <textarea class="form-control" name="note" id="note">' . (isset($ledger_update_data) ? $ledger_update_data[0]->note : "") . '</textarea>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" name="update_ledger" >Update</button>
                     <button type="button"  onclick="goBack()"  class="btn btn-info" >Back</button>
+                    <button type="submit" class="btn btn-primary" >Update</button>
                 </div>';
         }
     }
@@ -796,7 +781,7 @@ class Admin extends MY_Controller
         if (isset($_POST['bank_name'])) {
             $bank_name_on_chequeNumber_row = $this->input->post('bank_name');
             $bank_name_on_chequeNumber = $this->admin_model->getBankNameONChequeNumber($bank_name_on_chequeNumber_row);
-            print_r($bank_name_on_chequeNumber);
+            //print_r($bank_name_on_chequeNumber);
             foreach ($bank_name_on_chequeNumber as $bank_name) {
                 echo '<option></option>'
                     . '<option selected value="' . $bank_name->ledger_id . '">' . $bank_name->ledger_name . '</option>';

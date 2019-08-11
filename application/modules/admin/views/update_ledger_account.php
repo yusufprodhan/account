@@ -86,9 +86,11 @@
         $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
 
         $('#ledger_section').hide();
+
         $('#select_ledger').change("select2:select", function (e) {
             $('#ledger_section').show();
             var ledger = $(this).val();
+
             $.ajax({
                 url: "<?= site_url('/admin/getLedgerUpdateData/'); ?>",
                 type: 'post',
