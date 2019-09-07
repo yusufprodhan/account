@@ -2,24 +2,8 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <?php
-                $error = $this->session->flashdata('error');
-                $success = $this->session->flashdata('successMsg');
-                if ($error) {
-                    ?>
-                    <div class = "alert alert-danger alert-dismissable" >
-                        <button type="button" class= "close" data-dismiss="alert" aria-hidden ="true"><i class="fa fa-times" aria-hidden="true"></i></button>
-                        <?php echo $error; ?>
-                    </div>
-                <?php }if ($success) { ?>
-
-                    <div class="alert alert-success alert-dismissable" >
-                        <button type = "button" class= "close" data-dismiss= "alert" aria-hidden= "true"><i class="fa fa-times" aria-hidden="true"></i></button>
-                        <?php echo $success; ?>
-                    </div>
-                <?php } ?>
                 <h2><?php
-                    if (isset($title)) {
+                    if (!empty($title)) {
                         echo $title;
                     }
                     ?></h2>
@@ -28,6 +12,24 @@
                 </ul>
                 <div class="clearfix"></div>
             </div>
+			<div class="al">
+				<?php
+				$error = $this->session->flashdata('error');
+				$success = $this->session->flashdata('successMsg');
+				if ($error) {
+					?>
+					<div class = "alert alert-danger alert-dismissable" >
+						<button type="button" class= "close" data-dismiss="alert" aria-hidden ="true"><i class="fa fa-times" aria-hidden="true"></i></button>
+						<?php echo $error; ?>
+					</div>
+				<?php }if ($success) { ?>
+
+					<div class="alert alert-success alert-dismissable" >
+						<button type = "button" class= "close" data-dismiss= "alert" aria-hidden= "true"><i class="fa fa-times" aria-hidden="true"></i></button>
+						<?php echo $success; ?>
+					</div>
+				<?php } ?>
+			</div>
             <div class="x_content">
                 <form class="form-horizontal" action="<?php echo site_url() ?>admin/journalVoucher" method="post" enctype="multipart">
                     <div class="row">
@@ -89,7 +91,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6" id="cheque_area">
+                                <div class="col-md-6" id="cheque_area" style="display: none;">
                                     <div class="form-group">
                                         <div class="row">
                                             <label for="cheque_book_number" class="col-sm-3 col-form-label">Cheque Book Number</label>
@@ -172,9 +174,9 @@
                                                     <option value="1">Demo Tax</option>
                                                 </select>
                                             </td>
-                                            <td><input style="text-align:right;" type="text"  name="debit_amount[]" id="debit_amount_" class="form-control debit_amount"></td>
-                                            <td><input style="text-align:right;" type="text"  name="credit_amount[]" id="credit_amount_" class="form-control credit_amount"></td>
-                                            <td width="12%"><button class="btn btn-success add_row" test="test" type="button" id="add_row"><i class="fa fa-plus"></i></button><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" title="Delete User"></a></td>
+                                            <td><input style="text-align:right;" type="text"  name="debit_amount[]" id="debit_amount_" class="form-control debit_amount prevent"></td>
+                                            <td><input style="text-align:right;" type="text"  name="credit_amount[]" id="credit_amount_" class="form-control credit_amount prevent"></td>
+                                            <td width="12%"><button class="btn btn-success add_row" type="button" id="add_row"><i class="fa fa-plus"></i></button><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" title="Delete User"></a></td>
                                         </tr>
                                         <tr class="tr_prepend">
                                             <td></td>
@@ -199,7 +201,7 @@
                                 </div>
                             </div> 
                             <button type="reset" class="btn btn-danger" onClick="location.reload()">Cancel</button>
-                            <button type="submit" name="save_journal" class="btn btn-success pull-right" id="save_journal" value="Complete Journal Voucher">Save Journal Voucher</button>
+                            <button type="button" class="btn btn-success pull-right" id="save_journal" style="display: none;">Save Journal Voucher</button>
                         </div>                        
                     </div>                    
                 </form>
@@ -207,180 +209,266 @@
         </div>
     </div>
 </div>
-</div>
 
 <script>
-    $(document).ready(function () {
-        var counter = 1
-        var debit_sum = 0;
-        var credit_sum = 0;
-        var debit_each_value = 0;
-        var credit_each_value = 0;
+	$(document).ready(function () {
 
-        $(document).on('change keyup', '.prevent', function () {
-            var numchange = $(this).val().replace(/[^0-9.]/g, '');
-            numchange = numchange.replace(/\.(?=.*\.)/, '');
-            $(this).val(numchange);
-        });
+		$('.alert-success').delay(2000).hide(300).css({'color': '#fff'});
+		$('.alert-danger').delay(2000).hide(300).css({'color': '#fff'});
 
-        $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
-        $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
+		//for cheque
+		$('#chequsave_receivee_area').hide();
+		$("#save_journal").hide();
+	});
 
-        //for cheque
-        $('#cheque_area').hide();
-        $('#paymode').change("select2:select", function (e) {
-            var paymode = $(this).val();
-            if (paymode === '2') {
-                //alert('ok');
-                $('#cheque_area').css('display', 'inline-block');
-            } else {
-                $('#cheque_area').css('display', 'none');
-            }
-        });
+	var counter = 1;
+	var debit_sum = 0;
+	var credit_sum = 0;
+	var debit_each_value = 0;
+	var credit_each_value = 0;
 
+	//for balance
+	$(document).on('change','.account_head',function () {
+		var ledger_id = $(this).val();
+		var current = $(this);
+		$(this).parent().parent().find('.current_balance').html('');
+		var ledger_count = 0;
+		$('.account_head').each(function () {
+			var own_val = $(this).val();
+			if(own_val == ledger_id){
+				ledger_count +=1;
+			}
+		});
 
-        //===================for debit and credit=============================        
+		if(ledger_count == 1){
+			$.ajax({
+				url: "<?= site_url('/admin/getDebitLedgerBalance/'); ?>",
+				type: 'post',
+				data: {ledger_id: ledger_id},
+				success: function (data) {
+					$(current).parent().parent().find('.current_balance').html(data);
+				}
+			});
+		}else{
+			alert('You have selected same account before!!!','alert-danger');
+			$(this).closest('tr').remove();
+			$("#save_journal").hide();
+			$("#save_journal").attr('type','button');
+		}
+		debitSum();
+		creditSum();
+	});
 
-        $(document).on("click",'.add_row', function (e) {
-            var cols = "";
-            var newRow = $('<tr>');
-            cols += '<td width="20%"><select id="account_head_' + counter + '" class="form-control select2 account_head" name="account_head[]"><option></option> <?php if (isset($all_ledgers)): ?><?php if ($all_ledgers == !NULL): ?><?php foreach ($all_ledgers as $ledger): ?><option value="<?php echo $ledger->id ?>"><?php echo $ledger->ledger_name ?></option><?php endforeach; ?><?php endif; ?><?php endif; ?></select></td>';
-            cols += '<td width="12%" class="current_balance" id="current_balance_' + counter + '"></td>';
-            cols += '<td width="20%"><input type="text" name="description[]" class="form-control" id="description_' + counter + '"></td>';
-            cols += '<td><select id="tax_' + counter + '" class="form-control select2 text" name="tax[]"><option></option><option value="1">Demo Tax</option></select></td>';
-            cols += '<td><input style="text-align:right;" type="text"  name="debit_amount[]" id="debit_amount_' + counter + '" class="form-control debit_amount"></td>';
-            cols += '<td><input style="text-align:right;" type="text"  name="credit_amount[]" id="credit_amount_' + counter + '" class="form-control credit_amount"></td>';
-            cols += '<td width="12%"><button class="btn btn-success add_row" test="test" type="button" id="add_row"><i class="fa fa-plus"></i></button><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" id="' + counter + '" title="Delete User"></a></td>';
-            newRow.append(cols);
-            $(this).parent().parent().after(newRow);
-            
-            $(document).find("[test='test']").each(function(){$(this).addClass('add_row')});
-            counter++;
+	//for cheque number
+	$(document).on('change','#cheque_book_number',function () {
+		var cheque_book_number = $(this).val();
 
-            //for balance
-            $(".account_head").change("select2:select", function (e) {
-                var ledger_id = $(this).val();
-                var current = $(this);
-                $.ajax({
-                    url: "<?= site_url('/admin/getDebitLedgerBalance/'); ?>",
-                    type: 'post',
-                    data: {ledger_id: ledger_id},
-                    success: function (data) {
-                        $(current).parent().parent().find('.current_balance').html(data);
-                    }
-                });
-            });
-        });
+		//for cheque number
+		$.ajax({
+			url: "<?= site_url('/admin/getAllChequeNumber/'); ?>",
+			type: 'post',
+			data: {cheque_book_number: cheque_book_number},
+			success: function (data) {
+				$('#cheque_number').html(data);
+			}
+		});
 
-        //for balance
-        $(".account_head").change("select2:select", function (e) {
-            var ledger_id = $(this).val();
-            var current = $(this);
-            $.ajax({
-                url: "<?= site_url('/admin/getDebitLedgerBalance/'); ?>",
-                type: 'post',
-                data: {ledger_id: ledger_id},
-                success: function (data) {
-                    $(current).parent().parent().find('.current_balance').html(data);
-                }
-            });
-        });
+		//for bank name
+		$.ajax({
+			url: "<?= site_url('/admin/getBankNameONChequeNumber/'); ?>",
+			type: 'post',
+			data: {cheque_book_number: cheque_book_number},
+			success: function (data) {
+				$('#bank_name').html(data);
+			}
+		});
+	});
 
-        //for cheque number
-        $("#cheque_book_number").change("select2:select", function (e) {
-            var cheque_book_number = $(this).val();
-            $.ajax({
-                url: "<?= site_url('/admin/getAllChequeNumber/'); ?>",
-                type: 'post',
-                data: {cheque_book_number: cheque_book_number},
-                success: function (data) {
-                    $('#cheque_number').html(data);
-                }
-            });
-        });
-        
-        //for cheque number
-        $("#cheque_book_number").change("select2:select", function (e) {
-            var bank_name = $(this).val();
-            $.ajax({
-                url: "<?= site_url('/admin/getBankNameONChequeNumber/'); ?>",
-                type: 'post',
-                data: {bank_name: bank_name},
-                success: function (data) {
-                    $('#bank_name').html(data);
-                }
-            });
-        });
+	//get check area on select check mode
+	$(document).on('change','#paymode',function () {
+		var paymode = $(this).val();
+		if (paymode === '2') {
+			$('#cheque_area').css('display', 'inline-block');
+		} else {
+			$('#cheque_area').css('display', 'none');
+		}
+	});
 
-        //for delete row
-        $(".dc_table tbody").on("click", ".debitbtnDel", function (event) {
-            debit_sum = $("#debit_total").val();
-            credit_sum = $("#cerdit_total").val();
-            debit_each_value = $('#debit_amount_' + $(this).attr('id')).val();
-            credit_each_value = $('#credit_amount_' + $(this).attr('id')).val();
-            debit_sum = debit_sum - debit_each_value;
-            credit_sum = credit_sum - credit_each_value;
-            $(this).closest("tr").remove();
-            counter--;
-            $("#debit_total").val(debit_sum);
-            $("#cerdit_total").val(credit_sum);
-        });
+	//for number type input field validation
+	$(document).on('input', '.prevent', function () {
+		var numchange = $(this).val().replace(/[^0-9.]/g, '');
+		numchange = numchange.replace(/\.(?=.*\.)/, '');
+		$(this).val(numchange);
+	});
 
+	//for add row
+	$(document).on("click",'.add_row', function () {
+		var cols = "";
+		var newRow = $('<tr>');
+		cols += '<td width="20%"><select id="account_head_' + counter + '" class="form-control select2 account_head" name="account_head[]"><option></option> <?php if (isset($all_ledgers)): ?><?php if ($all_ledgers == !NULL): ?><?php foreach ($all_ledgers as $ledger): ?><option value="<?php echo $ledger->id ?>"><?php echo $ledger->ledger_name ?></option><?php endforeach; ?><?php endif; ?><?php endif; ?></select></td>';
+		cols += '<td width="12%" class="current_balance" id="current_balance_' + counter + '"></td>';
+		cols += '<td width="20%"><input type="text" name="description[]" class="form-control" id="description_' + counter + '"></td>';
+		cols += '<td><select id="tax_' + counter + '" class="form-control select2 text" name="tax[]"><option></option><option value="1">Demo Tax</option></select></td>';
+		cols += '<td><input style="text-align:right;" type="text"  name="debit_amount[]" id="debit_amount_' + counter + '" class="form-control debit_amount prevent"></td>';
+		cols += '<td><input style="text-align:right;" type="text"  name="credit_amount[]" id="credit_amount_' + counter + '" class="form-control credit_amount prevent"></td>';
+		cols += '<td width="12%"><button class="btn btn-success add_row" type="button" id="add_row"><i class="fa fa-plus"></i></button><a class=" debitbtnDel btn btn-danger glyphicon glyphicon-remove" id="' + counter + '" title="Delete User"></a></td>';
+		newRow.append(cols);
+		$(this).parent().parent().after(newRow);
+		counter++;
+		$(document).find(".account_head").select2();
+	});
 
+	//for delete row
+	$(".dc_table tbody").on("click", ".debitbtnDel", function () {
+		debit_sum = $("#debit_total").val();
+		credit_sum = $("#cerdit_total").val();
+		debit_each_value = $('#debit_amount_' + $(this).attr('id')).val();
+		credit_each_value = $('#credit_amount_' + $(this).attr('id')).val();
+		if(isNaN(debit_sum)){
+			debit_sum = 0;
+		}
+		if(isNaN(credit_sum)){
+			credit_sum = 0;
+		}
+		if(debit_each_value == undefined){
+			debit_each_value = 0
+		}
+		if(credit_each_value == undefined){
+			credit_each_value = 0
+		}
 
-        //for debit total calculation
-        $(document).on('input', '.debit_amount', debitSum);
-        debitSum();
+		debit_sum = debit_sum - debit_each_value;
+		credit_sum = credit_sum - credit_each_value;
+		$(this).closest("tr").remove();
+		counter--;
+		if (debit_sum == credit_sum && debit_sum != 0 && credit_sum != 0) {
+			$("#debit_total").val(debit_sum);
+			$("#cerdit_total").val(credit_sum);
+			$("#save_journal").show();
+			$("#save_journal").attr('type','submit');
+		}else{
+			$("#debit_total").val(0);
+			$("#cerdit_total").val(0);
+			$("#save_journal").hide();
+			$("#save_journal").attr('type','button');
+		}
+	});
 
-        //for credit total calculation
-        $(document).on('input', '.credit_amount', creditSum);
-        creditSum();
+	var debit_total_val;
+	var credit_total_val;
 
-        $("#save_journal").hide();
-        var debit_total_val;
-        var credit_total_val;
+	//on change debit amount
+	$(document).on("input", '.debit_amount', function () {
+		var account_id = $(this).parent().parent().find('.account_head').val();
+		var current_amo = parseInt($(this).closest('tr').find('.balance').attr('current'));
+		var own_amo = parseInt($(this).val());
+		$(this).parent().parent().find('.credit_amount').val(0);
+		if(account_id){
+			creditSum();
+			debitSum();
+			credit_total_val = $("#cerdit_total").val();
+			debit_total_val = $("#debit_total").val();
+			if (debit_total_val == credit_total_val && debit_total_val != 0 && credit_total_val != 0) {
+				$("#save_journal").show();
+				$("#save_journal").attr('type','submit');
+			} else {
+				$("#save_journal").hide();
+				$("#save_journal").attr('type','button');
+			}
+			// if(own_amo > current_amo){
+			// 	alert('You have crossed current balance limit','alert-danger');
+			// 	$(this).val('');
+			// }else{
+			// 	creditSum();
+			// 	debitSum();
+			// 	credit_total_val = $("#cerdit_total").val();
+			// 	debit_total_val = $("#debit_total").val();
+			// 	if (debit_total_val == credit_total_val && debit_total_val != 0 && credit_total_val != 0) {
+			// 		$("#save_contra").show();
+			// 		$("#save_contra").attr('type','submit');
+			// 	} else {
+			// 		$("#save_contra").hide();
+			// 		$("#save_contra").attr('type','button');
+			// 	}
+			// }
+		}else {
+			alert('Please select account head before!!!','alert-danger');
+			$(this).val('');
+		}
+	});
 
-        $(document).on("change", '.debit_amount', function () {
-            debit_total_val = $("#debit_total").val();
-            credit_total_val = $("#cerdit_total").val();
-            if (debit_total_val == credit_total_val) {
-                $("#save_journal").show();
-            } else {
-                $("#save_journal").hide();
-            }
-        });
+	//on change credit amount
+	$(document).on("input", '.credit_amount', function () {
+		var account_id = $(this).parent().parent().find('.account_head').val();
+		var current_amo = parseInt($(this).closest('tr').find('.balance').attr('current'));
+		var own_amo = parseInt($(this).val());
+		$(this).parent().parent().find('.debit_amount').val(0);
+		if(account_id){
+			creditSum();
+			debitSum();
+			credit_total_val = $("#cerdit_total").val();
+			debit_total_val = $("#debit_total").val();
+			if (debit_total_val == credit_total_val && debit_total_val != 0 && credit_total_val != 0) {
+				$("#save_journal").show();
+				$("#save_journal").attr('type','submit');
+			} else {
+				$("#save_journal").hide();
+				$("#save_journal").attr('type','button');
+			}
+			// if(own_amo > current_amo){
+			// 	alert('You have crossed current balance limit','alert-danger');
+			// 	$(this).val('');
+			// }else{
+			// 	creditSum();
+			// 	debitSum();
+			// 	credit_total_val = $("#cerdit_total").val();
+			// 	debit_total_val = $("#debit_total").val();
+			// 	if (debit_total_val == credit_total_val && debit_total_val != 0 && credit_total_val != 0) {
+			// 		$("#save_contra").show();
+			// 		$("#save_contra").attr('type','submit');
+			// 	} else {
+			// 		$("#save_contra").hide();
+			// 		$("#save_contra").attr('type','button');
+			// 	}
+			// }
+		}else {
+			alert('Please select account head before!!!','alert-danger');
+			$(this).val('');
+		}
+	});
 
-        $(document).on("change", '.credit_amount', function () {
-            credit_total_val = $("#cerdit_total").val();
-            debit_total_val = $("#debit_total").val();
-            if (debit_total_val == credit_total_val) {
-                $("#save_journal").show();
-            } else {
-                $("#save_journal").hide();
-            }
-        });
+	//for debit total calculation function
+	function debitSum() {
+		var total = 0, debit_total;
+		$(".dc_table tbody .debit_amount").each(function () {
+			debit_total = $(this).val();
+			debit_total = isNaN(debit_total) || $.trim(debit_total) === "" ? 0 : parseFloat(debit_total);
+			total += debit_total;
+		});
+		$("#debit_total").val(Math.round(total));
+	}
 
-    });
+	//for credit total calculation function
+	function creditSum() {
+		var ctotal = 0, credit_total;
+		$(".dc_table tbody .credit_amount").each(function () {
+			credit_total = $(this).val();
+			credit_total = isNaN(credit_total) || $.trim(credit_total) === "" ? 0 : parseFloat(credit_total);
+			ctotal += credit_total;
+		});
+		$("#cerdit_total").val(Math.round(ctotal));
+	}
 
-    //for debit total calculation function
-    function debitSum() {
-        var total = 0, debit_total;
-        $(".dc_table tbody .debit_amount").each(function () {
-            debit_total = $(this).val();
-            debit_total = isNaN(debit_total) || $.trim(debit_total) === "" ? 0 : parseFloat(debit_total);
-            total += debit_total;
-        });
-        $("#debit_total").val(Math.round(total));
-    }
+	//alert function
+	function alert(massage,type) {
+		var html='<div class="alert '+ type +' alert-dismissable" >' +
+			'          <button type = "button" class= "close" data-dismiss= "alert" aria-hidden= "true">' +
+			'				<i class="fa fa-times" aria-hidden="true"></i>' +
+			'			</button>' +massage+
+			'     </div>';
 
-    //for credit total calculation function
-    function creditSum() {
-        var ctotal = 0, credit_total;
-        $(".dc_table tbody .credit_amount").each(function () {
-            credit_total = $(this).val();
-            credit_total = isNaN(credit_total) || $.trim(credit_total) === "" ? 0 : parseFloat(credit_total);
-            ctotal += credit_total;
-        });
-        $("#cerdit_total").val(Math.round(ctotal));
-    }
+		$(document).find('.al').html(html);
+		$('.alert-success').delay(2000).hide(300).css({'color': '#fff'});
+		$('.alert-danger').delay(2000).hide(300).css({'color': '#fff'});
+	}
 </script>

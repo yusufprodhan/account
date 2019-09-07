@@ -106,7 +106,7 @@
         var ledger_id = $(document).find('#ledger_name').val();
         if(ledger_id != undefined && start_date !='' && end_date !=''){
             $.ajax({
-                url: "<?= site_url('/admin/getLedgerWiseAccountStatement'); ?>",
+                url: "<?= site_url('/admin/getJournalStatement'); ?>",
                 type: 'post',
                 data: { start_date: start_date,end_date:end_date,ledger_id:ledger_id},
                 success: function (data) {
@@ -142,7 +142,7 @@
                 }
             });
         }else{
-			alert('Please Select Ledger');
+            alert('Please Select Ledger');
         }
     });
 </script>

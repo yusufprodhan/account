@@ -499,8 +499,10 @@ class Admin extends MY_Controller
                 $result = $this->admin_model->updateLedger($post);
                 if ($result == true) {
                     $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Ledger Updated successfully');
+                    redirect('admin/updateLedger');
                 } else {
                     $this->session->set_flashdata('error', '<strong>Failed!</strong> Updated Failed');
+					redirect('admin/updateLedger');
                 }
             }
         }
@@ -778,8 +780,8 @@ class Admin extends MY_Controller
 
     public function getBankNameONChequeNumber()
     {
-        if (isset($_POST['bank_name'])) {
-            $bank_name_on_chequeNumber_row = $this->input->post('bank_name');
+        if (isset($_POST['cheque_book_number'])) {
+            $bank_name_on_chequeNumber_row = $this->input->post('cheque_book_number');
             $bank_name_on_chequeNumber = $this->admin_model->getBankNameONChequeNumber($bank_name_on_chequeNumber_row);
             //print_r($bank_name_on_chequeNumber);
             foreach ($bank_name_on_chequeNumber as $bank_name) {
@@ -802,7 +804,7 @@ class Admin extends MY_Controller
             $balance_result = $this->admin_model->getDebitLedgerBalance($ledger_balnce_id);
             //print_r($debit_balance_result);
             foreach ($balance_result as $balance) {
-                echo '<input type="text" style="text-align:right;" readonly id="balnce" name="balnce" value="= ' . $balance->balance . '"class="form-control">';
+                echo '<input type="text" style="text-align:right;" readonly id="balance" name="balance" current="'.$balance->balance.'" value="= '.$balance->balance.'"class="form-control balance">';
             }
         }
     }
@@ -823,74 +825,17 @@ class Admin extends MY_Controller
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $data->all_cheque_number = $this->admin_model->getAllChequeBookNumber();
-        $this->load->library('form_validation');
-        $config = array(
-            array(
-                'field' => 'paymode',
-                'label' => 'Payment Mode',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'You must provide %s',
-                ),
-            ),
-        );
-        $this->form_validation->set_rules($config);
-        if ($this->form_validation->run() == true) {
-            if (isset($_POST['save_payment'])) {
-                $voucher_date_row = $this->input->post('paymode');
-                $voucher_date = date('Y-m-d', strtotime($voucher_date_row));
-                $paymode = $this->input->post('paymode');
-                $reference_number = $this->input->post('reference');
-                $mobile_number = $this->input->post('mobile_number');
-                $cheque_book_number = $this->input->post('cheque_book_number');
-                $cheque_number = $this->input->post('cheque_number');
-                $cheque_date_row = $this->input->post('cheque_date');
-                $cheque_date = date('Y-m-d', strtotime($cheque_date_row));
-                $bank_name = $this->input->post('bank_name');
-                $total = $this->input->post('debit_total');
-                $credit_total = $this->input->post('credit_total');
-                $debit_total = $this->input->post('debit_total');
-                $narration = $this->input->post('narration');
-
-                $account_head = $this->input->post('account_head');
-                $description = $this->input->post('description');
-                $tax_id = $this->input->post('tax');
-                $debit_amount = $this->input->post('debit_amount');
-                $credit_amount = $this->input->post('credit_amount');
-                $length = count($this->input->post('account_head'));
-
-                $voucher_master_data = array(
-                    'paymode_id ' => $paymode,
-                    'voucher_date' => $voucher_date,
-                    'voucher_type' => 'PV',
-                    'reference_no' => $reference_number,
-                    'mobile_number' => $mobile_number,
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number,
-                    'cheque_date' => $cheque_date,
-                    'bank_id' => $bank_name,
-                    'total' => $total,
-                    'narration' => $narration,
-                    'created_by' => $_SESSION['username'],
-                    'status' => 'active',
-                );
-                if ($debit_total == $credit_total) {
-                    $voucher_id = $this->admin_model->insertPaymentVoucher($voucher_master_data, $cheque_book_number, $cheque_number);
-                } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Your Balance is not equal. Please check');
-                }
-
-                var_dump($voucher_id);
-                if ($voucher_id) {
-                    $result = $this->admin_model->insertPaymentVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length);
-                    if ($result == true) {
-                        $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Payment successfully');
-                    } else {
-                        $this->session->set_flashdata('error', '<strong>Failed!</strong> Payment Voucher Failed');
-                    }
-                }
-            }
-        }
+		$post = $this->input->post();
+		if(!empty($post['account_head'])){
+			$result = $this->admin_model->insertPaymentVoucher($post);
+			if($result){
+				$this->session->set_flashdata('successMsg', '<strong>Success!</strong> Payment Voucher Successfully');
+				redirect('admin/paymentVoucher');
+			} else {
+				$this->session->set_flashdata('error', '<strong>Failed!</strong> Payment Voucher Failed');
+				redirect('admin/paymentVoucher');
+			}
+		}
         $data->payment_voucher_number = $this->admin_model->getPaymentVoucherId();
         $this->template->load('admin/template_dashboard', 'admin/add_payment_voucher', $data);
     }
@@ -905,74 +850,17 @@ class Admin extends MY_Controller
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $data->all_cheque_number = $this->admin_model->getAllChequeBookNumber();
-        $this->load->library('form_validation');
-        $config = array(
-            array(
-                'field' => 'paymode',
-                'label' => 'Payment Mode',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'You must provide %s',
-                ),
-            ),
-        );
-        $this->form_validation->set_rules($config);
-        if ($this->form_validation->run() == true) {
-            if (isset($_POST['save_receive'])) {
-                $voucher_date_row = $this->input->post('paymode');
-                $voucher_date = date('Y-m-d', strtotime($voucher_date_row));
-                $paymode = $this->input->post('paymode');
-                $reference_number = $this->input->post('reference');
-                $mobile_number = $this->input->post('mobile_number');
-                $cheque_book_number = $this->input->post('cheque_book_number');
-                $cheque_number = $this->input->post('cheque_number');
-                $cheque_date_row = $this->input->post('cheque_date');
-                $cheque_date = date('Y-m-d', strtotime($cheque_date_row));
-                $bank_name = $this->input->post('bank_name');
-                $total = $this->input->post('debit_total');
-                $credit_total = $this->input->post('credit_total');
-                $debit_total = $this->input->post('debit_total');
-                $narration = $this->input->post('narration');
-
-                $account_head = $this->input->post('account_head');
-                $description = $this->input->post('description');
-                $tax_id = $this->input->post('tax');
-                $debit_amount = $this->input->post('debit_amount');
-                $credit_amount = $this->input->post('credit_amount');
-                $length = count($this->input->post('account_head'));
-
-                $voucher_master_data = array(
-                    'paymode_id ' => $paymode,
-                    'voucher_date' => $voucher_date,
-                    'voucher_type' => 'RV',
-                    'reference_no' => $reference_number,
-                    'mobile_number' => $mobile_number,
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number,
-                    'cheque_date' => $cheque_date,
-                    'bank_id' => $bank_name,
-                    'total' => $total,
-                    'narration' => $narration,
-                    'created_by' => $_SESSION['username'],
-                    'status' => 'active',
-                );
-                if ($debit_total == $credit_total) {
-                    $voucher_id = $this->admin_model->insertReceiveVoucher($voucher_master_data, $cheque_book_number, $cheque_number);
-                } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Your Balance is not equal. Please check');
-                }
-
-                var_dump($voucher_id);
-                if ($voucher_id) {
-                    $result = $this->admin_model->insertReceiveVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length);
-                    if ($result == true) {
-                        $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Receive successfully');
-                    } else {
-                        $this->session->set_flashdata('error', '<strong>Failed!</strong> Receive Voucher Failed');
-                    }
-                }
-            }
-        }
+		$post = $this->input->post();
+		if(!empty($post['account_head'])){
+			$result = $this->admin_model->insertReceiveVoucher($post);
+			if($result){
+				$this->session->set_flashdata('successMsg', '<strong>Success!</strong> Receive Voucher Successfully');
+				redirect('admin/receiveVoucher');
+			} else {
+				$this->session->set_flashdata('error', '<strong>Failed!</strong> Receive Voucher Failed');
+				redirect('admin/receiveVoucher');
+			}
+		}
         $data->receive_voucher_number = $this->admin_model->getReceiveVoucherId();
         $this->template->load('admin/template_dashboard', 'admin/add_receive_voucher', $data);
     }
@@ -987,74 +875,17 @@ class Admin extends MY_Controller
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $data->all_cheque_number = $this->admin_model->getAllChequeBookNumber();
-        $this->load->library('form_validation');
-        $config = array(
-            array(
-                'field' => 'paymode',
-                'label' => 'Payment Mode',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'You must provide %s',
-                ),
-            ),
-        );
-        $this->form_validation->set_rules($config);
-        if ($this->form_validation->run() == true) {
-            if (isset($_POST['save_journal'])) {
-                $voucher_date_row = $this->input->post('paymode');
-                $voucher_date = date('Y-m-d', strtotime($voucher_date_row));
-                $paymode = $this->input->post('paymode');
-                $reference_number = $this->input->post('reference');
-                $mobile_number = $this->input->post('mobile_number');
-                $cheque_book_number = $this->input->post('cheque_book_number');
-                $cheque_number = $this->input->post('cheque_number');
-                $cheque_date_row = $this->input->post('cheque_date');
-                $cheque_date = date('Y-m-d', strtotime($cheque_date_row));
-                $bank_name = $this->input->post('bank_name');
-                $total = $this->input->post('debit_total');
-                $credit_total = $this->input->post('credit_total');
-                $debit_total = $this->input->post('debit_total');
-                $narration = $this->input->post('narration');
-
-                $account_head = $this->input->post('account_head');
-                $description = $this->input->post('description');
-                $tax_id = $this->input->post('tax');
-                $debit_amount = $this->input->post('debit_amount');
-                $credit_amount = $this->input->post('credit_amount');
-                $length = count($this->input->post('account_head'));
-
-                $voucher_master_data = array(
-                    'paymode_id ' => $paymode,
-                    'voucher_date' => $voucher_date,
-                    'voucher_type' => 'JV',
-                    'reference_no' => $reference_number,
-                    'mobile_number' => $mobile_number,
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number,
-                    'cheque_date' => $cheque_date,
-                    'bank_id' => $bank_name,
-                    'total' => $total,
-                    'narration' => $narration,
-                    'created_by' => $_SESSION['username'],
-                    'status' => 'active',
-                );
-                if ($debit_total == $credit_total) {
-                    $voucher_id = $this->admin_model->insertJournalVoucher($voucher_master_data, $cheque_book_number, $cheque_number);
-                } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Your Balance is not equal. Please check');
-                }
-
-                var_dump($voucher_id);
-                if ($voucher_id) {
-                    $result = $this->admin_model->insertJournalVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length);
-                    if ($result == true) {
-                        $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Journal Payment successfully');
-                    } else {
-                        $this->session->set_flashdata('error', '<strong>Failed!</strong> Journal Voucher Failed');
-                    }
-                }
-            }
-        }
+		$post = $this->input->post();
+		if(!empty($post['account_head'])){
+			$result = $this->admin_model->insertJournalVoucher($post);
+			if($result){
+				$this->session->set_flashdata('successMsg', '<strong>Success!</strong> Journal Voucher Successfully');
+				redirect('admin/journalVoucher');
+			} else {
+				$this->session->set_flashdata('error', '<strong>Failed!</strong> Journal Voucher Failed');
+				redirect('admin/journalVoucher');
+			}
+		}
         $data->journal_voucher_number = $this->admin_model->getJournalVoucherId();
         $this->template->load('admin/template_dashboard', 'admin/add_journal_voucher', $data);
     }
@@ -1069,74 +900,17 @@ class Admin extends MY_Controller
         $data->all_ledgers = $this->admin_model->getAllLedger();
         $data->all_bank_names = $this->admin_model->getAllBankName();
         $data->all_cheque_number = $this->admin_model->getAllChequeBookNumber();
-        $this->load->library('form_validation');
-        $config = array(
-            array(
-                'field' => 'paymode',
-                'label' => 'Payment Mode',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'You must provide %s',
-                ),
-            ),
-        );
-        $this->form_validation->set_rules($config);
-        if ($this->form_validation->run() == true) {
-            if (isset($_POST['save_contra'])) {
-                $voucher_date_row = $this->input->post('paymode');
-                $voucher_date = date('Y-m-d', strtotime($voucher_date_row));
-                $paymode = $this->input->post('paymode');
-                $reference_number = $this->input->post('reference');
-                $mobile_number = $this->input->post('mobile_number');
-                $cheque_book_number = $this->input->post('cheque_book_number');
-                $cheque_number = $this->input->post('cheque_number');
-                $cheque_date_row = $this->input->post('cheque_date');
-                $cheque_date = date('Y-m-d', strtotime($cheque_date_row));
-                $bank_name = $this->input->post('bank_name');
-                $total = $this->input->post('debit_total');
-                $credit_total = $this->input->post('credit_total');
-                $debit_total = $this->input->post('debit_total');
-                $narration = $this->input->post('narration');
-
-                $account_head = $this->input->post('account_head');
-                $description = $this->input->post('description');
-                $tax_id = $this->input->post('tax');
-                $debit_amount = $this->input->post('debit_amount');
-                $credit_amount = $this->input->post('credit_amount');
-                $length = count($this->input->post('account_head'));
-
-                $voucher_master_data = array(
-                    'paymode_id ' => $paymode,
-                    'voucher_date' => $voucher_date,
-                    'voucher_type' => 'JV',
-                    'reference_no' => $reference_number,
-                    'mobile_number' => $mobile_number,
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number,
-                    'cheque_date' => $cheque_date,
-                    'bank_id' => $bank_name,
-                    'total' => $total,
-                    'narration' => $narration,
-                    'created_by' => $_SESSION['username'],
-                    'status' => 'active',
-                );
-                if ($debit_total == $credit_total) {
-                    $voucher_id = $this->admin_model->insertContraVoucher($voucher_master_data, $cheque_book_number, $cheque_number);
-                } else {
-                    $this->session->set_flashdata('error', '<strong>Failed!</strong> Your Balance is not equal. Please check');
-                }
-
-                var_dump($voucher_id);
-                if ($voucher_id) {
-                    $result = $this->admin_model->insertContraVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length);
-                    if ($result == true) {
-                        $this->session->set_flashdata('successMsg', '<strong>Success!</strong> Contra Payment successfully');
-                    } else {
-                        $this->session->set_flashdata('error', '<strong>Failed!</strong> Contra Voucher Failed');
-                    }
-                }
-            }
-        }
+		$post = $this->input->post();
+		if(!empty($post['account_head'])){
+			$result = $this->admin_model->insertContraVoucher($post);
+			if($result){
+				$this->session->set_flashdata('successMsg', '<strong>Success!</strong> Contra Voucher Successfully');
+				redirect('admin/contraVoucher');
+			} else {
+				$this->session->set_flashdata('error', '<strong>Failed!</strong> Contra Voucher Failed');
+				redirect('admin/contraVoucher');
+			}
+		}
         $data->contra_voucher_number = $this->admin_model->getContraVoucherId();
         $this->template->load('admin/template_dashboard', 'admin/add_contra_voucher', $data);
     }
@@ -2233,33 +2007,44 @@ class Admin extends MY_Controller
                 $end_date = date('Y-m-d', strtotime($post['end_date']));
                 $ledger_id = $post['ledger_id'];
                 $ledger_wise_account_statement = $this->admin_model->getLedgerWiseAccountStatement($start_date, $end_date, $ledger_id);
-//                echo '<pre>';
-//                print_r($ledger_wise_account_statement);die();
+//					echo '<pre>';
+//					print_r($ledger_wise_account_statement);
                 if (!empty($ledger_wise_account_statement)) {
                     $i = 1;
-                    $total =0;
                     echo '<thead>
                             <tr>
                                 <th>SL</th>
                                 <th>Date</th>
                                 <th>Voucher No</th>
                                 <th>Type</th>
+                                <th>Notes</th>
                                 <th>Debit Amount</th>
                                 <th>Credit Amount</th>
                                 <th>Balance</th>
-                                <th>Notes</th>
-                            </tr>
+                           </tr>
                             </thead>
                             <tbody>';
                     $debit_total = 0;
                     $credit_total = 0;
+					$balance = 0;
+					$final_bal = 0;
                     foreach (call_user_func_array('array_merge', $ledger_wise_account_statement) as $val) {
-                        $debit_total+=$val["debit_amount"];
+						if($final_bal = $val["ledger_id"] == $ledger_id){
+							$final_bal = abs($val["balance"]);
+						}
+						if($val["credit_amount"] != 0){
+							$notation = 'Cr';
+						}else{
+							$notation = 'Dr';
+						}
+
+                    	$debit_total+=$val["debit_amount"];
                         $credit_total+=$val["credit_amount"];
+                        $balance += $val["debit_amount"] + $val["credit_amount"];
                         echo '<tr>
                                 <td>' . $i . '</td>
                                 <td>' . $val["voucher_date"].'</td>
-                                <td>' . $val["id"] . '</td>';
+                                <td>' .$val["voucher_type"].' '.$val["id"].'</td>';
                                 if($val["voucher_type"] == 'RV'){
                                     echo ' <td>Receive</td>;';
                                 }elseif($val["voucher_type"] == 'PV'){
@@ -2269,20 +2054,27 @@ class Admin extends MY_Controller
                                 }elseif($val["voucher_type"] == 'CV'){
                                     echo ' <td>Contra</td>;';
                                 }
-                                echo'                              
-                                <td style="text-align: right">' . $val["debit_amount"] . '</td>
-                                <td style="text-align: right">' . $val["credit_amount"] . '</td>
-                                <td>' . $val["balance"].'</td>
-                                <td>' . $val["narration"].'</td>
+                                echo'
+								<td>' . $val["narration"].'</td>                              
+                                <td style="text-align: right">' . number_format($val["debit_amount"]) . '</td>
+                                <td style="text-align: right">' . number_format($val["credit_amount"]) . '</td>
+                                <td>' . number_format($balance).' '.$notation.'</td>
+                         	
                             </tr>';
                         $i++;
                     }
                     echo '</tbody><tfoot>
                             <tr>
-                                <td style="text-align: right" colspan="4">Grand Total</td>
-                                <td style="text-align: right">'.$debit_total.'</td>
-                                <td style="text-align: right">'.$credit_total.'</td>
-                            </tr>
+                                <td style="text-align: right" colspan="5">Grand Total</td>
+                                <td style="text-align: right">'.number_format($debit_total).'</td>
+                                <td style="tet-align: right">'.number_format($credit_total).'</td>';
+                    	if(!empty($final_bal)){
+                    		echo '<td>'.number_format($final_bal).'</td>';
+						}else{
+							echo '<td></td>';
+						}
+
+                            echo'</tr>
                           </tfoot>';
                 }else{
                     echo '<tr><td>Do not found any data.</td></tr>';
@@ -2295,6 +2087,115 @@ class Admin extends MY_Controller
         }
     }
 
+	/**
+	 * Journal statment
+	 * access public
+	 * return object
+	 * parameter date range
+	 */
+	public function journalStatement()
+	{
+		$data = new stdClass();
+		$data->title = 'Journal Statement';
+		$data->username = $_SESSION['username'];
+		$data->all_ledger = $this->db->select('id,ledger_name')->from('ledgers')->get()->result_array();
+		$this->template->load('admin/template_dashboard', 'admin/Account Reports/journal_statement', $data);
+	}
+
+	/**
+	 * Get Journal Statement report
+	 * access public
+	 * return object
+	 * parameter date range and ledger id
+	 */
+	public function getJournalStatement()
+	{
+		if(isset($_POST['start_date'])){
+			$post = $this->input->post();
+			if (!empty($post['start_date']) && !empty($post['end_date']) && !empty($post['ledger_id']) && $post['ledger_id'] != 'Select Ledger') {
+				$start_date = date('Y-m-d', strtotime($post['start_date']));
+				$end_date = date('Y-m-d', strtotime($post['end_date']));
+				$ledger_id = $post['ledger_id'];
+				$ledger_wise_account_statement = $this->admin_model->getLedgerWiseAccountStatement($start_date, $end_date, $ledger_id);
+//					echo '<pre>';
+//					print_r($ledger_wise_account_statement);
+				if (!empty($ledger_wise_account_statement)) {
+					$i = 1;
+					echo '<thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Date</th>
+                                <th>Voucher No</th>
+                                <th>Type</th>
+                                <th>Notes</th>
+                                <th>Debit Amount</th>
+                                <th>Credit Amount</th>
+                                <th>Balance</th>
+                           </tr>
+                            </thead>
+                            <tbody>';
+					$debit_total = 0;
+					$credit_total = 0;
+					$balance = 0;
+					$final_bal = 0;
+					foreach (call_user_func_array('array_merge', $ledger_wise_account_statement) as $val) {
+						if($final_bal = $val["ledger_id"] == $ledger_id){
+							$final_bal = abs($val["balance"]);
+						}
+						if($val["credit_amount"] != 0){
+							$notation = 'Cr';
+						}else{
+							$notation = 'Dr';
+						}
+
+						$debit_total+=$val["debit_amount"];
+						$credit_total+=$val["credit_amount"];
+						$balance += $val["debit_amount"] + $val["credit_amount"];
+						echo '<tr>
+                                <td>' . $i . '</td>
+                                <td>' . $val["voucher_date"].'</td>
+                                <td>' .$val["voucher_type"].' '.$val["id"].'</td>';
+						if($val["voucher_type"] == 'RV'){
+							echo ' <td>Receive</td>;';
+						}elseif($val["voucher_type"] == 'PV'){
+							echo ' <td>Payment</td>;';
+						}elseif($val["voucher_type"] == 'JV'){
+							echo ' <td>Journal</td>;';
+						}elseif($val["voucher_type"] == 'CV'){
+							echo ' <td>Contra</td>;';
+						}
+						echo'
+								<td>' . $val["narration"].'</td>                              
+                                <td style="text-align: right">' . number_format($val["debit_amount"]) . '</td>
+                                <td style="text-align: right">' . number_format($val["credit_amount"]) . '</td>
+                                <td>' . number_format($balance).' '.$notation.'</td>
+                         	
+                            </tr>';
+						$i++;
+					}
+					echo '</tbody><tfoot>
+                            <tr>
+                                <td style="text-align: right" colspan="5">Grand Total</td>
+                                <td style="text-align: right">'.number_format($debit_total).'</td>
+                                <td style="tet-align: right">'.number_format($credit_total).'</td>';
+					if(!empty($final_bal)){
+						echo '<td>'.number_format($final_bal).'</td>';
+					}else{
+						echo '<td></td>';
+					}
+
+					echo'</tr>
+                          </tfoot>';
+				}else{
+					echo '<tr><td>Do not found any data.</td></tr>';
+				}
+			}else{
+				echo '<tr><td>Do not found any data.</td></tr>';
+			}
+		}else{
+			echo '<tr><td>Do not found any data.</td></tr>';
+		}
+	}
 }
 
 ob_end_clean();

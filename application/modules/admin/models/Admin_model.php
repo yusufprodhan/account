@@ -468,6 +468,7 @@ class Admin_model extends CI_Model
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
 					'credit' => $data['opening_balance'],
+					'debit' => 0,
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -480,6 +481,7 @@ class Admin_model extends CI_Model
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
 					'debit' => $data['opening_balance'],
+					'credit' => 0,
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -771,166 +773,121 @@ class Admin_model extends CI_Model
 
     /*
      * @ insert payment voucher
-     * @ asscess public
+     * @ access public
      * return bool
      */
-
-    public function insertPaymentVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    public function insertPaymentVoucher($data)
     {
-        $result = $this->db->insert('payment_voucher_entries', $voucher_master_data);
-        $insert_id = $this->db->insert_id();
-        if ($result) {
-            if (!empty($cheque_book_number) and !empty($cheque_number)) {
-                $update_cheque_number = array(
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number
-                );
-                $update_data = array(
-                    'status' => 'taken'
-                );
-                $this->db->update('cheque_register', $update_data, $update_cheque_number);
-            }
-        }
-        return $insert_id;
-    }
+    	$flag = 0;
+		if(!empty($data['debit_total']) && !empty($data['credit_total'])){
+			if($data['debit_total'] == $data['credit_total']){
+				$voucher_master_data = array(
+					'paymode_id ' => $data['paymode'],
+					'voucher_date' => date('Y-m-d', strtotime($data['voucher_date'])),
+					'voucher_type' => 'PV',
+					'reference_no' => $data['reference'],
+					'mobile_number' => $data['mobile_number'],
+					'cheque_book_number' => $data['cheque_book_number'],
+					'cheque_number' => ((!empty($data['cheque_number']))? $data['cheque_number']:''),
+					'cheque_date' => date('Y-m-d', strtotime($data['cheque_date'])),
+					'bank_id' => ((!empty($data['bank_name']))? $data['bank_name']:''),
+					'total' => $data['debit_total'],
+					'narration' => $data['narration'],
+					'created_by' => $_SESSION['username'],
+					'status' => 'active',
+				);
+				$result= $this->db->insert('payment_voucher_entries', $voucher_master_data);
+				$insert_id = $this->db->insert_id();
+				if($result){
+					foreach ($data['account_head'] as $key=>$val){
+						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+						if(!empty($ledger_exists_data)){
+							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+							$balance = $debit_amount - $credit_amount;
 
-    /*
-     * @ insert payment voucher details
-     * @ asscess public
-     * return bool
-     */
+							$details_data = array(
+								'voucher_entries_id' => $insert_id,
+								'ledger_id' => $val,
+								'description' => $data['description'][$key],
+								'tax_id' => $data['tax'][$key],
+								'debit_amount' => $data['debit_amount'][$key],
+								'credit_amount' => $data['credit_amount'][$key]
+							);
+							$details_result = $this->db->insert('payment_voucher_entries_details', $details_data);
+							if($details_result){
+								$flag = 1;
+								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+							}
+						}
+					}
+				}
+			}
+		}
 
-    public function insertPaymentVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
-    {
-        $this->db->trans_begin();
-        for ($i = 0; $i < $length; $i++) {
-            $details_data = array(
-                'voucher_entries_id' => $voucher_id,
-                'ledger_id' => $account_head[$i],
-                'description' => $description[$i],
-                'tax_id' => $tax_id[$i],
-                'debit_amount' => $debit_amount[$i],
-                'credit_amount' => $credit_amount[$i]
-            );
-            $d_amount = $debit_amount[$i];
-//            if ($d_amount == NULL) {
-//                $d_amount = 0;
-//            }
-            $c_amount = $credit_amount[$i];
-//            if ($c_amount == NULL) {
-//                $c_amount = 0;
-//            }
-            $result = $this->db->insert('payment_voucher_entries_details', $details_data);
-            if ($result) {
-                $get_exit_ledger_balance_data = array(
-                    'id' => $account_head[$i]
-                );
-
-                $get_exitledger_balance = $this->db->get_where('ledgers', $get_exit_ledger_balance_data);
-                if ($get_exitledger_balance->num_rows() > 0) {
-                    if ($d_amount == NULL) {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row - $c_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    } else {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row + $d_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    }
-                }
-            }
-        }
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+		if($flag == 1){
+			return true;
+		}
     }
 
     /*
      * @ insert receive voucher
-     * @ asscess public
+     * @ access public
      * return bool
      */
 
-    public function insertReceiveVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    public function insertReceiveVoucher($data)
     {
-        $result = $this->db->insert('receive_voucher_entries', $voucher_master_data);
-        $insert_id = $this->db->insert_id();
-        if ($result) {
-            if (!empty($cheque_book_number) and !empty($cheque_number)) {
-                $update_cheque_number = array(
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number
-                );
-                $update_data = array(
-                    'status' => 'taken'
-                );
-                $this->db->update('cheque_register', $update_data, $update_cheque_number);
-            }
-        }
-        return $insert_id;
-    }
+		$flag = 0;
+		if(!empty($data['debit_total']) && !empty($data['credit_total'])){
+			if($data['debit_total'] == $data['credit_total']){
+				$voucher_master_data = array(
+					'paymode_id ' => $data['paymode'],
+					'voucher_date' => date('Y-m-d', strtotime($data['voucher_date'])),
+					'voucher_type' => 'RV',
+					'reference_no' => $data['reference'],
+					'mobile_number' => $data['mobile_number'],
+					'cheque_book_number' => $data['cheque_book_number'],
+					'cheque_number' => ((!empty($data['cheque_number']))? $data['cheque_number']:''),
+					'cheque_date' => date('Y-m-d', strtotime($data['cheque_date'])),
+					'bank_id' => ((!empty($data['bank_name']))? $data['bank_name']:''),
+					'total' => $data['debit_total'],
+					'narration' => $data['narration'],
+					'created_by' => $_SESSION['username'],
+					'status' => 'active',
+				);
+				$result= $this->db->insert('receive_voucher_entries', $voucher_master_data);
+				$insert_id = $this->db->insert_id();
+				if($result){
+					foreach ($data['account_head'] as $key=>$val){
+						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+						if(!empty($ledger_exists_data)){
+							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+							$balance = $debit_amount - $credit_amount;
 
-    /*
-     * @ insert receive voucher details
-     * @ asscess public
-     * return bool
-     */
+							$details_data = array(
+								'voucher_entries_id' => $insert_id,
+								'ledger_id' => $val,
+								'description' => $data['description'][$key],
+								'tax_id' => $data['tax'][$key],
+								'debit_amount' => $data['debit_amount'][$key],
+								'credit_amount' => $data['credit_amount'][$key]
+							);
+							$details_result = $this->db->insert('receive_voucher_entries_details', $details_data);
+							if($details_result){
+								$flag = 1;
+								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+							}
+						}
+					}
+				}
+			}
+		}
 
-    public function insertReceiveVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
-    {
-        $this->db->trans_begin();
-        for ($i = 0; $i < $length; $i++) {
-            $details_data = array(
-                'voucher_entries_id' => $voucher_id,
-                'ledger_id' => $account_head[$i],
-                'description' => $description[$i],
-                'tax_id' => $tax_id[$i],
-                'debit_amount' => $debit_amount[$i],
-                'credit_amount' => $credit_amount[$i]
-            );
-            $d_amount = $debit_amount[$i];
-            $c_amount = $credit_amount[$i];
-            $result = $this->db->insert('receive_voucher_entries_details', $details_data);
-            if ($result) {
-                $get_exit_ledger_balance_data = array(
-                    'id' => $account_head[$i]
-                );
-
-                $get_exitledger_balance = $this->db->get_where('ledgers', $get_exit_ledger_balance_data);
-                if ($get_exitledger_balance->num_rows() > 0) {
-                    if ($d_amount == NULL) {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row - $c_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    } else {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row + $d_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    }
-                }
-            }
-        }
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+		if($flag == 1){
+			return true;
+		}
     }
 
     /*
@@ -939,77 +896,58 @@ class Admin_model extends CI_Model
      * return bool
      */
 
-    public function insertJournalVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    public function insertJournalVoucher($data)
     {
-        $result = $this->db->insert('journal_voucher_entries', $voucher_master_data);
-        $insert_id = $this->db->insert_id();
-        if ($result) {
-            if (!empty($cheque_book_number) and !empty($cheque_number)) {
-                $update_cheque_number = array(
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number
-                );
-                $update_data = array(
-                    'status' => 'taken'
-                );
-                $this->db->update('cheque_register', $update_data, $update_cheque_number);
-            }
-        }
-        return $insert_id;
-    }
+		$flag = 0;
+		if(!empty($data['debit_total']) && !empty($data['credit_total'])){
+			if($data['debit_total'] == $data['credit_total']){
+				$voucher_master_data = array(
+					'paymode_id ' => $data['paymode'],
+					'voucher_date' => date('Y-m-d', strtotime($data['voucher_date'])),
+					'voucher_type' => 'JV',
+					'reference_no' => $data['reference'],
+					'mobile_number' => $data['mobile_number'],
+					'cheque_book_number' => $data['cheque_book_number'],
+					'cheque_number' => ((!empty($data['cheque_number']))? $data['cheque_number']:''),
+					'cheque_date' => date('Y-m-d', strtotime($data['cheque_date'])),
+					'bank_id' => ((!empty($data['bank_name']))? $data['bank_name']:''),
+					'total' => $data['debit_total'],
+					'narration' => $data['narration'],
+					'created_by' => $_SESSION['username'],
+					'status' => 'active',
+				);
+				$result= $this->db->insert('journal_voucher_entries', $voucher_master_data);
+				$insert_id = $this->db->insert_id();
+				if($result){
+					foreach ($data['account_head'] as $key=>$val){
+						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+						if(!empty($ledger_exists_data)){
+							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+							$balance = $debit_amount - $credit_amount;
 
-    /*
-     * @ insert journal voucher details
-     * @ asscess public
-     * return bool
-     */
+							$details_data = array(
+								'voucher_entries_id' => $insert_id,
+								'ledger_id' => $val,
+								'description' => $data['description'][$key],
+								'tax_id' => $data['tax'][$key],
+								'debit_amount' => $data['debit_amount'][$key],
+								'credit_amount' => $data['credit_amount'][$key]
+							);
+							$details_result = $this->db->insert('journal_voucher_entries_details', $details_data);
+							if($details_result){
+								$flag = 1;
+								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+							}
+						}
+					}
+				}
+			}
+		}
 
-    public function insertJournalVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
-    {
-        $this->db->trans_begin();
-        for ($i = 0; $i < $length; $i++) {
-            $details_data = array(
-                'voucher_entries_id' => $voucher_id,
-                'ledger_id' => $account_head[$i],
-                'description' => $description[$i],
-                'tax_id' => $tax_id[$i],
-                'debit_amount' => $debit_amount[$i],
-                'credit_amount' => $credit_amount[$i]
-            );
-            $d_amount = $debit_amount[$i];
-            $c_amount = $credit_amount[$i];
-            $result = $this->db->insert('journal_voucher_entries_details', $details_data);
-            if ($result) {
-                $get_exit_ledger_balance_data = array(
-                    'id' => $account_head[$i]
-                );
-
-                $get_exitledger_balance = $this->db->get_where('ledgers', $get_exit_ledger_balance_data);
-                if ($get_exitledger_balance->num_rows() > 0) {
-                    if ($d_amount == NULL) {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row - $c_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    } else {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row + $d_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    }
-                }
-            }
-        }
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+		if($flag == 1){
+			return true;
+		}
     }
 
     /*
@@ -1018,77 +956,58 @@ class Admin_model extends CI_Model
      * return bool
      */
 
-    public function insertContraVoucher($voucher_master_data, $cheque_book_number, $cheque_number)
+    public function insertContraVoucher($data)
     {
-        $result = $this->db->insert('contra_voucher_entries', $voucher_master_data);
-        $insert_id = $this->db->insert_id();
-        if ($result) {
-            if (!empty($cheque_book_number) and !empty($cheque_number)) {
-                $update_cheque_number = array(
-                    'cheque_book_number' => $cheque_book_number,
-                    'cheque_number' => $cheque_number
-                );
-                $update_data = array(
-                    'status' => 'taken'
-                );
-                $this->db->update('cheque_register', $update_data, $update_cheque_number);
-            }
-        }
-        return $insert_id;
-    }
+		$flag = 0;
+		if(!empty($data['debit_total']) && !empty($data['credit_total'])){
+			if($data['debit_total'] == $data['credit_total']){
+				$voucher_master_data = array(
+					'paymode_id ' => $data['paymode'],
+					'voucher_date' => date('Y-m-d', strtotime($data['voucher_date'])),
+					'voucher_type' => 'JV',
+					'reference_no' => $data['reference'],
+					'mobile_number' => $data['mobile_number'],
+					'cheque_book_number' => $data['cheque_book_number'],
+					'cheque_number' => ((!empty($data['cheque_number']))? $data['cheque_number']:''),
+					'cheque_date' => date('Y-m-d', strtotime($data['cheque_date'])),
+					'bank_id' => ((!empty($data['bank_name']))? $data['bank_name']:''),
+					'total' => $data['debit_total'],
+					'narration' => $data['narration'],
+					'created_by' => $_SESSION['username'],
+					'status' => 'active',
+				);
+				$result= $this->db->insert('contra_voucher_entries', $voucher_master_data);
+				$insert_id = $this->db->insert_id();
+				if($result){
+					foreach ($data['account_head'] as $key=>$val){
+						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+						if(!empty($ledger_exists_data)){
+							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+							$balance = $debit_amount - $credit_amount;
 
-    /*
-     * @ insert contra voucher details
-     * @ asscess public
-     * return bool
-     */
+							$details_data = array(
+								'voucher_entries_id' => $insert_id,
+								'ledger_id' => $val,
+								'description' => $data['description'][$key],
+								'tax_id' => $data['tax'][$key],
+								'debit_amount' => $data['debit_amount'][$key],
+								'credit_amount' => $data['credit_amount'][$key]
+							);
+							$details_result = $this->db->insert('contra_voucher_entries_details', $details_data);
+							if($details_result){
+								$flag = 1;
+								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+							}
+						}
+					}
+				}
+			}
+		}
 
-    public function insertContraVoucherDetails($voucher_id, $account_head, $description, $tax_id, $debit_amount, $credit_amount, $length)
-    {
-        $this->db->trans_begin();
-        for ($i = 0; $i < $length; $i++) {
-            $details_data = array(
-                'voucher_entries_id' => $voucher_id,
-                'ledger_id' => $account_head[$i],
-                'description' => $description[$i],
-                'tax_id' => $tax_id[$i],
-                'debit_amount' => $debit_amount[$i],
-                'credit_amount' => $credit_amount[$i]
-            );
-            $d_amount = $debit_amount[$i];
-            $c_amount = $credit_amount[$i];
-            $result = $this->db->insert('contra_voucher_entries_details', $details_data);
-            if ($result) {
-                $get_exit_ledger_balance_data = array(
-                    'id' => $account_head[$i]
-                );
-
-                $get_exitledger_balance = $this->db->get_where('ledgers', $get_exit_ledger_balance_data);
-                if ($get_exitledger_balance->num_rows() > 0) {
-                    if ($d_amount == NULL) {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row - $c_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    } else {
-                        $balance_row = $get_exitledger_balance->result()[0]->balance;
-                        $balance = $balance_row + $d_amount;
-                        $update_balance = array(
-                            'balance' => $balance
-                        );
-                        $this->db->update('ledgers', $update_balance, $get_exit_ledger_balance_data);
-                    }
-                }
-            }
-        }
-        if ($this->db->trans_status() == TRUE) {
-            $this->db->trans_commit();
-            return TRUE;
-        } else {
-            $this->db->trans_rollback();
-        }
+		if($flag == 1){
+			return true;
+		}
     }
 
     /**
@@ -1390,10 +1309,12 @@ class Admin_model extends CI_Model
                                                    payment_voucher_entries.voucher_date,
                                                    payment_voucher_entries.narration,
                                                    payment_voucher_entries.voucher_type,
+                                                   ledgers.balance,
                                                    pv.ledger_id,
                                                    SUM(pv.debit_amount)as debit_amount,
                                                    SUM(pv.credit_amount)as credit_amount ')
             ->from('payment_voucher_entries_details as pv')
+			->join('ledgers','ledgers.id = pv.ledger_id')
             ->join('payment_voucher_entries','payment_voucher_entries.id = pv.voucher_entries_id')
             ->where("pv.ledger_id", $ledger_id)
             ->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
@@ -1407,10 +1328,12 @@ class Admin_model extends CI_Model
                                                    journal_voucher_entries.voucher_date,
                                                    journal_voucher_entries.narration,
                                                    journal_voucher_entries.voucher_type,
+                                                   ledgers.balance,
                                                    jv.ledger_id,
                                                    SUM(jv.debit_amount) as debit_amount,
                                                    SUM(jv.credit_amount) as credit_amount')
             ->from('journal_voucher_entries_details as jv')
+			->join('ledgers','ledgers.id = jv.ledger_id')
             ->join('journal_voucher_entries','journal_voucher_entries.id = jv.voucher_entries_id')
             ->where("jv.ledger_id", $ledger_id)
             ->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
@@ -1424,10 +1347,12 @@ class Admin_model extends CI_Model
                                                    contra_voucher_entries.voucher_date,
                                                    contra_voucher_entries.narration,
                                                    contra_voucher_entries.voucher_type,
+                                                   ledgers.balance,
                                                    cv.ledger_id,
                                                    SUM(cv.debit_amount) as debit_amount,
                                                    SUM(cv.credit_amount) as credit_amount')
             ->from('contra_voucher_entries_details as cv')
+			->join('ledgers','ledgers.id = cv.ledger_id')
             ->join('contra_voucher_entries','contra_voucher_entries.id = cv.voucher_entries_id')
             ->where("cv.ledger_id", $ledger_id)
             ->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
