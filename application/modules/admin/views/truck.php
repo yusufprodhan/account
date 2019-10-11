@@ -166,8 +166,33 @@
 
 <script>
     $(document).ready(function () {
-//         $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
-//         $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
+        $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
+        $('.alert-danger').delay(2000).hide(300).css({'color': 'red'});
+
+		//data table
+		$(document).find('#datatable').DataTable({
+			dom: 'Bfrtip',
+			"bRetrieve": true,
+			"bDestroy": true,
+			"bPaginate":true,
+			"lengthMenu": [[10,25, 50, 100, 500, -1], [10,25, 50, 100, 500, "All"]],
+			buttons: [
+				{
+					extend: 'csv',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'print',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'pageLength',
+					footer: true
+				}
+			],
+		});
 
     });
 

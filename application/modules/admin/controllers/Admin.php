@@ -1638,8 +1638,8 @@ class Admin extends MY_Controller
      */
     public function getTruckStatementMemberwise()
     {
-        if (isset($_POST['start_date'])) {
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post)) {
                 $start_date = date('Y-m-d', strtotime($post['start_date']));
                 $end_date = date('Y-m-d', strtotime($post['end_date']));
@@ -1672,7 +1672,7 @@ class Admin extends MY_Controller
                                 <td style="text-align: right">' . $truck_statement_memberwise["big"] . '</td>
                                 <td style="text-align: right">' . $truck_statement_memberwise["mini"] . '</td>
                                 <td style="text-align: right">' . floor($truck_statement_memberwise["big"] + $truck_statement_memberwise["mini"]) . '</td>
-                                <td style="text-align: right">' . ($truck_statement_memberwise["big"] + $truck_statement_memberwise["mini"]) * 100 . '</td>
+                                <td style="text-align: right">' . number_format(($truck_statement_memberwise["big"] + $truck_statement_memberwise["mini"]) * 100) . '</td>
                                 <td>' . $truck_statement_memberwise["remark"] . '</td>
                                 <td><button type="button" class="btn btn-primary m_truck_details" m_truck_id="'.$truck_statement_memberwise["truck_member_id"].'" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fa fa-eye"></i></button></td>
                             </tr>';
@@ -1686,8 +1686,8 @@ class Admin extends MY_Controller
                                 <td style="text-align: right">Grand Total</td>
                                 <td style="text-align: right">'.$total_big.'</td>
                                 <td style="text-align: right">'.$total_mini.'</td>
-                                <td style="text-align: right">'.($total_big + $total_mini).'</td>
-                                <td style="text-align: right">'.($total_big + $total_mini) *100 .'</td>
+                                <td style="text-align: right">'.number_format($total_big + $total_mini).'</td>
+                                <td style="text-align: right">'.number_format($total_big + $total_mini) *100 .'</td>
                             </tr>
                           </tfoot>';
 
@@ -1710,8 +1710,8 @@ class Admin extends MY_Controller
      */
     public function getMemberwiseTruckDetails()
     {
-        if (isset($_POST['member_id'])) {
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post)) {
                 $this->db->select('
                             member_truck_voucher_details.entry_date,
@@ -1778,8 +1778,8 @@ class Admin extends MY_Controller
      */
     public function getTruckStatementDetails()
     {
-        if(isset($_POST['start_date'])){
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post)) {
                 //$daterange = explode('-', $post['daterange']);
                 $start_date = date('Y-m-d', strtotime($post['start_date']));
@@ -1806,16 +1806,16 @@ class Admin extends MY_Controller
                                 <td>' . $i . '</td>
                                 <td>' . $truck_inc_statement["voucher_date"].'</td>
                                 <td>' . $truck_inc_statement["narration"] . '</td>
-                                <td style="text-align: right">' . ($truck_inc_statement["total"])/100 . '</td>
-                                <td style="text-align: right">' . $truck_inc_statement["total"] . '</td>                                
+                                <td style="text-align: right">' . number_format(($truck_inc_statement["total"])/100) . '</td>
+                                <td style="text-align: right">' . number_format($truck_inc_statement["total"]) . '</td>                                
                             </tr>';
                         $i++;
                     }
                     echo '</tbody><tfoot>
                             <tr>
                                 <td style="text-align: right" colspan="3">Grand Total</td>
-                                <td style="text-align: right">'.($total/100).'</td>
-                                <td style="text-align: right">'.$total.'</td>
+                                <td style="text-align: right">'.number_format(($total/100)).'</td>
+                                <td style="text-align: right">'.number_format($total).'</td>
                             </tr>
                           </tfoot>';
                 }else{
@@ -1852,8 +1852,8 @@ class Admin extends MY_Controller
      */
     public function getTruckIncomeStatement()
     {
-        if(isset($_POST['start_date'])){
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post)) {
                 //$daterange = explode('-', $post['daterange']);
                 $start_date = date('Y-m-d', strtotime($post['start_date']));
@@ -1881,14 +1881,14 @@ class Admin extends MY_Controller
                                 <td>' . $truck_inc_statement["voucher_date"].'</td>
                                 <td>' . $truck_inc_statement["narration"] . '</td>
                                 <td style="text-align: right">' . $truck_inc_statement["id"] . '</td>
-                                <td style="text-align: right">' . $truck_inc_statement["total"] . '</td>                                
+                                <td style="text-align: right">' . number_format($truck_inc_statement["total"]) . '</td>                                
                             </tr>';
                         $i++;
                     }
                     echo '</tbody><tfoot>
                             <tr>
                                 <td style="text-align: right" colspan="4">Grand Total</td>
-                                <td style="text-align: right">'.$total.'</td>
+                                <td style="text-align: right">'.number_format($total).'</td>
                             </tr>
                           </tfoot>';
                 }else{
@@ -1924,8 +1924,8 @@ class Admin extends MY_Controller
      */
     public function getTruckStatementNonMemberwise()
     {
-        if(isset($_POST['start_date'])){
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post)) {
                 //$daterange = explode('-', $post['daterange']);
                 $start_date = date('Y-m-d', strtotime($post['start_date']));
@@ -1955,15 +1955,15 @@ class Admin extends MY_Controller
                                 <td>' . $truck_statement_non_mem["created_by"] . '</td>                                
                                 <td>' . $truck_statement_non_mem["note"] . '</td>                                
                                 <td style="text-align: right">' . $truck_statement_non_mem["truck_count"] . '</td>
-                                <td style="text-align: right">' . $truck_statement_non_mem["total_amount"] . '</td>
+                                <td style="text-align: right">' . number_format($truck_statement_non_mem["total_amount"]) . '</td>
                             </tr>';
                         $i++;
                     }
                     echo '</tbody><tfoot>
                             <tr>
                                 <td style="text-align: right" colspan="4">Grand Total</td>
-                                <td style="text-align: right">'.($total/100).'</td>
-                                <td style="text-align: right">'.$total.'</td>
+                                <td style="text-align: right">'.number_format($total/100).'</td>
+                                <td style="text-align: right">'.number_format($total).'</td>
                             </tr>
                           </tfoot>';
                 }else{
@@ -2000,17 +2000,37 @@ class Admin extends MY_Controller
      */
     public function getLedgerWiseAccountStatement()
     {
-        if(isset($_POST['start_date'])){
-            $post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
             if (!empty($post['start_date']) && !empty($post['end_date']) && !empty($post['ledger_id']) && $post['ledger_id'] != 'Select Ledger') {
                 $start_date = date('Y-m-d', strtotime($post['start_date']));
                 $end_date = date('Y-m-d', strtotime($post['end_date']));
                 $ledger_id = $post['ledger_id'];
-                $ledger_wise_account_statement = $this->admin_model->getLedgerWiseAccountStatement($start_date, $end_date, $ledger_id);
+				$statement = $this->admin_model->getLedgerWiseAccountStatement($start_date, $end_date, $ledger_id);
 //					echo '<pre>';
-//					print_r($ledger_wise_account_statement);
-                if (!empty($ledger_wise_account_statement)) {
-                    $i = 1;
+//					print_r($statement);
+                if (!empty($statement['ledger_wise_statement'])) {
+                	if(!empty($statement['ledger_wise_before_date_statement'])){
+						$pre_debit = array_sum(array_column(call_user_func_array('array_merge', $statement['ledger_wise_before_date_statement']),'debit_amount'));
+						$pre_credit = array_sum(array_column(call_user_func_array('array_merge', $statement['ledger_wise_before_date_statement']),'credit_amount'));
+						$arr = call_user_func_array('array_merge', $statement['ledger_wise_statement']);
+						$op_notation = '';
+						if(!empty($arr)){
+							if($arr[0]["balance_type"] == 'C'){
+								$pre_balance = ($arr[0]["op_balance"] + $pre_credit) - $pre_debit;
+								$op_notation = 'Cr';
+							}elseif($arr[0]["balance_type"] == 'D'){
+								$pre_balance = ($arr[0]["op_balance"] + $pre_debit) - $pre_credit;
+								$op_notation = 'Dr';
+							}
+						}else{
+							$pre_balance = 0;
+						}
+
+					}else{
+						$pre_balance = 0;
+					}
+					$i = 1;
                     echo '<thead>
                             <tr>
                                 <th>SL</th>
@@ -2023,24 +2043,37 @@ class Admin extends MY_Controller
                                 <th>Balance</th>
                            </tr>
                             </thead>
-                            <tbody>';
+                            <tbody>
+                            <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align: right">Opening Balance</td>
+                            <td style="text-align: right">'.number_format(abs($pre_balance)).' '.$op_notation.'</td>
+                            </tr>';
                     $debit_total = 0;
                     $credit_total = 0;
 					$balance = 0;
-					$final_bal = 0;
-                    foreach (call_user_func_array('array_merge', $ledger_wise_account_statement) as $val) {
-						if($final_bal = $val["ledger_id"] == $ledger_id){
-							$final_bal = abs($val["balance"]);
-						}
-						if($val["credit_amount"] != 0){
-							$notation = 'Cr';
-						}else{
-							$notation = 'Dr';
-						}
+					$aar = call_user_func_array('array_merge', $statement['ledger_wise_statement']);
+					function sortFunction( $a, $b ) {
+						return strtotime($a["voucher_date"]) - strtotime($b["voucher_date"]);
+					}
+					usort($aar,"sortFunction");
+					$notation = '';
+                    foreach ($aar as $val) {
 
                     	$debit_total+=$val["debit_amount"];
                         $credit_total+=$val["credit_amount"];
-                        $balance += $val["debit_amount"] + $val["credit_amount"];
+                        $balance += ($pre_balance + $val["debit_amount"]) - $val["credit_amount"];
+
+                        if($balance > $val["credit_amount"]){
+							$notation = 'Dr';
+						}else{
+							$notation = 'Cr';
+						}
                         echo '<tr>
                                 <td>' . $i . '</td>
                                 <td>' . $val["voucher_date"].'</td>
@@ -2052,38 +2085,32 @@ class Admin extends MY_Controller
                                 }elseif($val["voucher_type"] == 'JV'){
                                     echo ' <td>Journal</td>;';
                                 }elseif($val["voucher_type"] == 'CV'){
-                                    echo ' <td>Contra</td>;';
+                                    echo ' <td>Contra</td>';
                                 }
                                 echo'
-								<td>' . $val["narration"].'</td>                              
-                                <td style="text-align: right">' . number_format($val["debit_amount"]) . '</td>
-                                <td style="text-align: right">' . number_format($val["credit_amount"]) . '</td>
-                                <td>' . number_format($balance).' '.$notation.'</td>
-                         	
-                            </tr>';
+									<td>' . $val["narration"].'</td>                              
+									<td style="text-align: right">' . number_format($val["debit_amount"]) . '</td>
+									<td style="text-align: right">' . number_format($val["credit_amount"]) . '</td>
+									<td style="text-align: right">' . number_format(abs($balance)).' '.$notation.'</td>
+                         	</tr>';
                         $i++;
+						$pre_balance=0;
                     }
-                    echo '</tbody><tfoot>
+                    echo '</tbody>
+						  <tfoot>
                             <tr>
-                                <td style="text-align: right" colspan="5">Grand Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="text-align: right">Grand Total</td>
                                 <td style="text-align: right">'.number_format($debit_total).'</td>
-                                <td style="tet-align: right">'.number_format($credit_total).'</td>';
-                    	if(!empty($final_bal)){
-                    		echo '<td>'.number_format($final_bal).'</td>';
-						}else{
-							echo '<td></td>';
-						}
-
-                            echo'</tr>
+                                <td style="text-align: right">'.number_format($credit_total).'</td>
+                                <td style="text-align: right">'.number_format(abs($balance)).' '.$notation.'</td>
+                    		</tr>
                           </tfoot>';
-                }else{
-                    echo '<tr><td>Do not found any data.</td></tr>';
                 }
-            }else{
-                echo '<tr><td>Do not found any data.</td></tr>';
             }
-        }else{
-            echo '<tr><td>Do not found any data.</td></tr>';
         }
     }
 
@@ -2092,7 +2119,7 @@ class Admin extends MY_Controller
 	 * access public
 	 * return object
 	 * parameter date range
-	 */
+	 **/
 	public function journalStatement()
 	{
 		$data = new stdClass();
@@ -2110,8 +2137,8 @@ class Admin extends MY_Controller
 	 */
 	public function getJournalStatement()
 	{
-		if(isset($_POST['start_date'])){
-			$post = $this->input->post();
+		$post = $this->input->post();
+		if(!empty($post['start_date']) && !empty($post['end_date'])){
 			if (!empty($post['start_date']) && !empty($post['end_date']) && !empty($post['ledger_id']) && $post['ledger_id'] != 'Select Ledger') {
 				$start_date = date('Y-m-d', strtotime($post['start_date']));
 				$end_date = date('Y-m-d', strtotime($post['end_date']));
@@ -2195,6 +2222,62 @@ class Admin extends MY_Controller
 		}else{
 			echo '<tr><td>Do not found any data.</td></tr>';
 		}
+	}
+
+	/**
+	 * Journal statment
+	 * access public
+	 * return object
+	 * parameter date range
+	 **/
+	public function groupWiseLedgerStatement()
+	{
+		$data = new stdClass();
+		$data->title = 'Group Statement';
+		$data->username = $_SESSION['username'];
+		$data->all_groups = $this->db->select('id,group_name')->from('groups')->get()->result_array();
+		$this->template->load('admin/template_dashboard', 'admin/Account Reports/group_wise_account_statement', $data);
+	}
+
+	/**
+	 * Trial Balance Statement
+	 * access public
+	 * return object
+	 * ***/
+
+	public function trialBalanceStatement(){
+		$data = new stdClass();
+		$data->title = 'Trial Balance Statement';
+		$data->username = $_SESSION['username'];
+		$this->template->load('admin/template_dashboard', 'admin/Financial State Reports/trial_balance_statement', $data);
+	}
+	/**
+	 * get Trial Balance Statement data
+	 * access public
+	 * return object
+	 * ***/
+
+	public function getTrialBalanceStatement(){
+		$post = $this->input->post();
+		$trial_balance_data = $this->admin_model->trialBalanceStatement($post);
+//		echo '<pre>';
+//		print_r($trial_balance_data);
+		echo json_encode($trial_balance_data);
+	}
+
+
+	/**
+	 * Balance Statement
+	 * access public
+	 * return object
+	 * ***/
+
+	public function balanceSheet(){
+		$data = new stdClass();
+		$data->title = 'Balance Statement';
+		$data->username = $_SESSION['username'];
+		$data->balance_data = $this->admin_model->balanceStatement();
+		$this->template->load('admin/template_dashboard', 'admin/Financial State Reports/balance_statement', $data);
 	}
 }
 

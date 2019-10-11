@@ -1,32 +1,18 @@
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" type="text/css"
+	  href="<?= site_url(); ?>assets/vendors/datatble/jqueryy.dataTables.min.css">
+<link rel="stylesheet" type="text/css"
+	  href="<?= site_url(); ?>assets/vendors/datatble/buttons.dataTables.min.css">
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <?php if ($this->session->flashdata('successMsg')): ?>
-                    <div class="alert alert-success alert-dismissible fadeIn show" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <?= $this->session->flashdata('successMsg'); ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($this->session->flashdata('error')): ?>
-                    <div class="alert alert-danger alert-dismissible fadeIn show" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <?= $this->session->flashdata('error'); ?>
-                    </div>
-                <?php endif; ?>
-                <h2><?php if(!empty($title)){echo $title;}else{echo $title;}?></h2>
+                <h2><?php if(!empty($title)){echo $title;}else{echo '';}?></h2>
                 <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
                 </ul>
-                <div class="clearfix"></div>
             </div>
             <div class="x_content">
+				<div class="head_alert"></div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="row">
@@ -78,39 +64,50 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<script src="<?= site_url(); ?>assets/vendors/datatble/jquery.dataTables.min.js"></script>
+<script src="<?= site_url(); ?>assets/vendors/datatble/dataTables.buttons.min.js"></script>
+<script src="<?= site_url(); ?>assets/vendors/datatble/buttons.html5.min.js"></script>
+<script src="<?= site_url(); ?>assets/vendors/datatble/buttons.print.min.js"></script>
 <script>
     $(document).ready(function () {
-//        $('input[name="daterange"]').daterangepicker();
 
-        $(function() {
-            $('input[name="daterange"]').daterangepicker({
-                opens: 'left'
-            }, function(start, end, label) {
-                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-            });
-        });
+    	//for date
+       $('.dateinput').datetimepicker({
+		   format: 'DD-MM-YYYY',
+		   defaultDate:new Date(),
+	   });
     });
+
+	//alert function
+	function alert_massage(massage, type){
+		var html = '<div class="alert '+ type +' alert-dismissible" role="alert">'+
+'                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+'                            <span aria-hidden="true">&times;</span>'+
+'                        </button>'+ massage +
+'                    </div>';
+		$(document).find('.head_alert').html(html);
+
+		//for showing alert
+		$('.alert-success').delay(2000).hide(1000).css({'color': '#fff'});
+		$('.alert-danger').delay(2000).hide(1000).css({'color': '#fff'});
+	}
 
     //for data
     $(document).on('click', '#search',  function () {
         var start_date = $('input[name="start_date"]').val();
         var end_date = $('input[name="end_date"]').val();
         var ledger_id = $(document).find('#ledger_name').val();
-        if(ledger_id != undefined && start_date !='' && end_date !=''){
+        if(ledger_id != 'Select Ledger'){
             $.ajax({
                 url: "<?= site_url('/admin/getLedgerWiseAccountStatement'); ?>",
                 type: 'post',
                 data: { start_date: start_date,end_date:end_date,ledger_id:ledger_id},
+				beforeSend: function(){
+					$('.loadingImage').show();
+				},
                 success: function (data) {
                     $(document).find('.data_table').html(data);
+					$('.loadingImage').hide();
                     $(document).find('.data_table').DataTable({
                         dom: 'Bfrtip',
                         "bRetrieve": true,
@@ -120,11 +117,6 @@
                         buttons: [
                             {
                                 extend: 'csv',
-                                footer: true,
-                                filename: 'Truck Statement Report Memberwise'
-                            },
-                            {
-                                extend: 'excel',
                                 footer: true,
                                 filename: 'Truck Statement Report Memberwise'
                             },
@@ -142,7 +134,7 @@
                 }
             });
         }else{
-			alert('Please Select Ledger');
+			alert_massage('Please Select Ledger Before Search','alert-danger')
         }
     });
 </script>

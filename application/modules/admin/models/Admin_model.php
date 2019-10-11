@@ -417,7 +417,7 @@ class Admin_model extends CI_Model
 					'group_id' => $data['ledger_parent'],
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
-					'credit' => $data['opening_balance'],
+//					'credit' => $data['opening_balance'],
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -429,7 +429,7 @@ class Admin_model extends CI_Model
 					'group_id' => $data['ledger_parent'],
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
-					'debit' => $data['opening_balance'],
+//					'debit' => $data['opening_balance'],
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -438,8 +438,7 @@ class Admin_model extends CI_Model
 				);
 
 			}
-
-        $result = $this->db->insert('ledgers', $insert_data);
+			$result = $this->db->insert('ledgers', $insert_data);
 			if($result){
 				return true;
 			}else{
@@ -458,17 +457,17 @@ class Admin_model extends CI_Model
      * @return bool
      */
 
-    public function updateLedger($data)
+		public function updateLedger($data)
     {
     	if(!empty($data['ledger_id'])){
-			$check_exists = $this->db->get_where('ledgers',array('id'=>$data['ledger_id']))->row();
+			$check_exists = $this->db->get_where('ledgers',array('id'=>$data['ledger_id']))->row_array();
 			if($data['balance_type'] == 'C'){
 				$update_data = array(
 					'group_id' => $data['ledger_parent'],
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
-					'credit' => $data['opening_balance'],
-					'debit' => 0,
+//					'credit' => $data['opening_balance'],
+//					'debit' => 0,
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -480,8 +479,8 @@ class Admin_model extends CI_Model
 					'group_id' => $data['ledger_parent'],
 					'ledger_name' => $data['ledger_name'],
 					'op_balance' => $data['opening_balance'],
-					'debit' => $data['opening_balance'],
-					'credit' => 0,
+//					'debit' => $data['opening_balance'],
+//					'credit' => 0,
 					'balance' => $data['opening_balance'],
 					'balance_type' => $data['balance_type'],
 					'note ' => $data['note'],
@@ -490,7 +489,7 @@ class Admin_model extends CI_Model
 				);
 
 			}
-			if($check_exists->op_balance == $check_exists->balance){
+			if(abs($check_exists['op_balance']) == abs($check_exists['balance'])){
 				$result = $this->db->update('ledgers', $update_data,array('id'=>$data['ledger_id']));
 				if($result){
 					return true;
@@ -800,24 +799,37 @@ class Admin_model extends CI_Model
 				$insert_id = $this->db->insert_id();
 				if($result){
 					foreach ($data['account_head'] as $key=>$val){
-						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
-						if(!empty($ledger_exists_data)){
-							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
-							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
-							$balance = $debit_amount - $credit_amount;
-
-							$details_data = array(
-								'voucher_entries_id' => $insert_id,
-								'ledger_id' => $val,
-								'description' => $data['description'][$key],
-								'tax_id' => $data['tax'][$key],
-								'debit_amount' => $data['debit_amount'][$key],
-								'credit_amount' => $data['credit_amount'][$key]
-							);
-							$details_result = $this->db->insert('payment_voucher_entries_details', $details_data);
-							if($details_result){
-								$flag = 1;
-								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+						$details_data = array(
+							'voucher_entries_id' => $insert_id,
+							'ledger_id' => $val,
+							'description' => $data['description'][$key],
+							'tax_id' => $data['tax'][$key],
+							'debit_amount' => $data['debit_amount'][$key],
+							'credit_amount' => $data['credit_amount'][$key]
+						);
+						$details_result = $this->db->insert('payment_voucher_entries_details', $details_data);
+						if($details_result){
+							$flag = 1;
+							$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+							if(!empty($ledger_exists_data)){
+								$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+								$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+								if($debit_amount>$credit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($debit_amount-$credit_amount),
+										'balance_type'=>'D'
+									);
+								}elseif ($credit_amount>$debit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($credit_amount-$debit_amount),
+										'balance_type'=>'C'
+									);
+								}
+								$this->db->update('ledgers',$update_ledger_array,array('id'=>$val));
 							}
 						}
 					}
@@ -860,24 +872,38 @@ class Admin_model extends CI_Model
 				$insert_id = $this->db->insert_id();
 				if($result){
 					foreach ($data['account_head'] as $key=>$val){
-						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
-						if(!empty($ledger_exists_data)){
-							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
-							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
-							$balance = $debit_amount - $credit_amount;
+						$details_data = array(
+							'voucher_entries_id' => $insert_id,
+							'ledger_id' => $val,
+							'description' => $data['description'][$key],
+							'tax_id' => $data['tax'][$key],
+							'debit_amount' => $data['debit_amount'][$key],
+							'credit_amount' => $data['credit_amount'][$key]
+						);
+						$details_result = $this->db->insert('receive_voucher_entries_details', $details_data);
 
-							$details_data = array(
-								'voucher_entries_id' => $insert_id,
-								'ledger_id' => $val,
-								'description' => $data['description'][$key],
-								'tax_id' => $data['tax'][$key],
-								'debit_amount' => $data['debit_amount'][$key],
-								'credit_amount' => $data['credit_amount'][$key]
-							);
-							$details_result = $this->db->insert('receive_voucher_entries_details', $details_data);
-							if($details_result){
-								$flag = 1;
-								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+						if($details_result){
+							$flag = 1;
+							$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+							if(!empty($ledger_exists_data)){
+								$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+								$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+								if($debit_amount>$credit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($debit_amount-$credit_amount),
+										'balance_type'=>'D'
+									);
+								}elseif ($credit_amount>$debit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($credit_amount-$debit_amount),
+										'balance_type'=>'C'
+									);
+								}
+								$this->db->update('ledgers',$update_ledger_array,array('id'=>$val));
 							}
 						}
 					}
@@ -920,24 +946,37 @@ class Admin_model extends CI_Model
 				$insert_id = $this->db->insert_id();
 				if($result){
 					foreach ($data['account_head'] as $key=>$val){
-						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
-						if(!empty($ledger_exists_data)){
-							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
-							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
-							$balance = $debit_amount - $credit_amount;
-
-							$details_data = array(
-								'voucher_entries_id' => $insert_id,
-								'ledger_id' => $val,
-								'description' => $data['description'][$key],
-								'tax_id' => $data['tax'][$key],
-								'debit_amount' => $data['debit_amount'][$key],
-								'credit_amount' => $data['credit_amount'][$key]
-							);
-							$details_result = $this->db->insert('journal_voucher_entries_details', $details_data);
-							if($details_result){
-								$flag = 1;
-								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+						$details_data = array(
+							'voucher_entries_id' => $insert_id,
+							'ledger_id' => $val,
+							'description' => $data['description'][$key],
+							'tax_id' => $data['tax'][$key],
+							'debit_amount' => $data['debit_amount'][$key],
+							'credit_amount' => $data['credit_amount'][$key]
+						);
+						$details_result = $this->db->insert('journal_voucher_entries_details', $details_data);
+						if($details_result){
+							$flag = 1;
+							$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+							if(!empty($ledger_exists_data)){
+								$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+								$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+								if($debit_amount>$credit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($debit_amount-$credit_amount),
+										'balance_type'=>'D'
+									);
+								}elseif ($credit_amount>$debit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($credit_amount-$debit_amount),
+										'balance_type'=>'C'
+									);
+								}
+								$this->db->update('ledgers',$update_ledger_array,array('id'=>$val));
 							}
 						}
 					}
@@ -980,24 +1019,38 @@ class Admin_model extends CI_Model
 				$insert_id = $this->db->insert_id();
 				if($result){
 					foreach ($data['account_head'] as $key=>$val){
-						$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
-						if(!empty($ledger_exists_data)){
-							$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
-							$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
-							$balance = $debit_amount - $credit_amount;
+						$details_data = array(
+							'voucher_entries_id' => $insert_id,
+							'ledger_id' => $val,
+							'description' => $data['description'][$key],
+							'tax_id' => $data['tax'][$key],
+							'debit_amount' => $data['debit_amount'][$key],
+							'credit_amount' => $data['credit_amount'][$key]
+						);
+						$details_result = $this->db->insert('contra_voucher_entries_details', $details_data);
 
-							$details_data = array(
-								'voucher_entries_id' => $insert_id,
-								'ledger_id' => $val,
-								'description' => $data['description'][$key],
-								'tax_id' => $data['tax'][$key],
-								'debit_amount' => $data['debit_amount'][$key],
-								'credit_amount' => $data['credit_amount'][$key]
-							);
-							$details_result = $this->db->insert('contra_voucher_entries_details', $details_data);
-							if($details_result){
-								$flag = 1;
-								$this->db->update('ledgers',array('debit'=>$debit_amount,'credit'=>$credit_amount,'balance'=>$balance),array('id'=>$val));
+						if($details_result){
+							$flag = 1;
+							$ledger_exists_data = $this->db->get_where('ledgers',array('id'=>$val))->row();
+							if(!empty($ledger_exists_data)){
+								$debit_amount = ($ledger_exists_data->debit) + ($data['debit_amount'][$key]);
+								$credit_amount = ($ledger_exists_data->credit) + ($data['credit_amount'][$key]);
+								if($debit_amount>$credit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($debit_amount-$credit_amount),
+										'balance_type'=>'D'
+									);
+								}elseif ($credit_amount>$debit_amount){
+									$update_ledger_array = array(
+										'debit'=>$debit_amount,
+										'credit'=>$credit_amount,
+										'balance'=>($credit_amount-$debit_amount),
+										'balance_type'=>'C'
+									);
+								}
+								$this->db->update('ledgers',$update_ledger_array,array('id'=>$val));
 							}
 						}
 					}
@@ -1279,19 +1332,23 @@ class Admin_model extends CI_Model
         return $truck_statement_report_nonmemberwise;
     }
     /**
-     * Truck statement report Non memberwise
+     * get account ledger wise statement
      * access public
      * return object
+	 * parameter ledger id
      * parameter date range
      */
     public function getLedgerWiseAccountStatement($start_date,$end_date,$ledger_id){
         $ledger_wise_statement = array();
+        $ledger_wise_before_date_statement = array();
         $receive_statement = $this->db->select('receive_voucher_entries.id,
                                                    receive_voucher_entries.voucher_date,
                                                    receive_voucher_entries.narration,
                                                    receive_voucher_entries.voucher_type,
-                                                   receive_voucher_entries.narration,
+                                                   ledgers.op_balance,
                                                    ledgers.balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
                                                    rv.ledger_id,
                                                    SUM(rv.debit_amount) as debit_amount,
                                                    SUM(rv.credit_amount) as credit_amount')
@@ -1304,12 +1361,37 @@ class Admin_model extends CI_Model
                                         ->group_by('receive_voucher_entries.voucher_date')
                                         ->group_by('receive_voucher_entries.id')
                                         ->get()->result_array();
+
         array_push($ledger_wise_statement,$receive_statement);
+
+		$before_receive_statement = $this->db->select('receive_voucher_entries.id,
+                                                   receive_voucher_entries.voucher_date,
+                                                   receive_voucher_entries.narration,
+                                                   receive_voucher_entries.voucher_type,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   rv.ledger_id,
+                                                   SUM(rv.debit_amount) as debit_amount,
+                                                   SUM(rv.credit_amount) as credit_amount')
+			->from('receive_voucher_entries_details as rv')
+			->join('ledgers','ledgers.id = rv.ledger_id')
+			->join('receive_voucher_entries','receive_voucher_entries.id = rv.voucher_entries_id')
+			->where("rv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('receive_voucher_entries.voucher_date')
+			->group_by('receive_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_receive_statement);
         $payment_statement = $this->db->select('payment_voucher_entries.id,
                                                    payment_voucher_entries.voucher_date,
                                                    payment_voucher_entries.narration,
                                                    payment_voucher_entries.voucher_type,
                                                    ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
                                                    pv.ledger_id,
                                                    SUM(pv.debit_amount)as debit_amount,
                                                    SUM(pv.credit_amount)as credit_amount ')
@@ -1323,12 +1405,35 @@ class Admin_model extends CI_Model
             ->group_by('payment_voucher_entries.id')
             ->get()->result_array();
         array_push($ledger_wise_statement,$payment_statement);
+		$before_payment_statement = $this->db->select('payment_voucher_entries.id,
+                                                   payment_voucher_entries.voucher_date,
+                                                   payment_voucher_entries.narration,
+                                                   payment_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   pv.ledger_id,
+                                                   SUM(pv.debit_amount)as debit_amount,
+                                                   SUM(pv.credit_amount)as credit_amount ')
+			->from('payment_voucher_entries_details as pv')
+			->join('ledgers','ledgers.id = pv.ledger_id')
+			->join('payment_voucher_entries','payment_voucher_entries.id = pv.voucher_entries_id')
+			->where("pv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('payment_voucher_entries.voucher_date')
+			->group_by('payment_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_payment_statement);
 
         $journal_statement = $this->db->select('journal_voucher_entries.id,
                                                    journal_voucher_entries.voucher_date,
                                                    journal_voucher_entries.narration,
                                                    journal_voucher_entries.voucher_type,
                                                    ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
                                                    jv.ledger_id,
                                                    SUM(jv.debit_amount) as debit_amount,
                                                    SUM(jv.credit_amount) as credit_amount')
@@ -1343,11 +1448,35 @@ class Admin_model extends CI_Model
             ->get()->result_array();
         array_push($ledger_wise_statement,$journal_statement);
 
+		$jbefore_ournal_statement = $this->db->select('journal_voucher_entries.id,
+                                                   journal_voucher_entries.voucher_date,
+                                                   journal_voucher_entries.narration,
+                                                   journal_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   jv.ledger_id,
+                                                   SUM(jv.debit_amount) as debit_amount,
+                                                   SUM(jv.credit_amount) as credit_amount')
+			->from('journal_voucher_entries_details as jv')
+			->join('ledgers','ledgers.id = jv.ledger_id')
+			->join('journal_voucher_entries','journal_voucher_entries.id = jv.voucher_entries_id')
+			->where("jv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('journal_voucher_entries.voucher_date')
+			->group_by('journal_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$jbefore_ournal_statement);
+
         $contra_statement = $this->db->select('contra_voucher_entries.id,
                                                    contra_voucher_entries.voucher_date,
                                                    contra_voucher_entries.narration,
                                                    contra_voucher_entries.voucher_type,
                                                    ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
                                                    cv.ledger_id,
                                                    SUM(cv.debit_amount) as debit_amount,
                                                    SUM(cv.credit_amount) as credit_amount')
@@ -1362,8 +1491,370 @@ class Admin_model extends CI_Model
             ->get()->result_array();
         array_push($ledger_wise_statement,$contra_statement);
 
-        return $ledger_wise_statement;
+		$before_contra_statement = $this->db->select('contra_voucher_entries.id,
+                                                   contra_voucher_entries.voucher_date,
+                                                   contra_voucher_entries.narration,
+                                                   contra_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   cv.ledger_id,
+                                                   SUM(cv.debit_amount) as debit_amount,
+                                                   SUM(cv.credit_amount) as credit_amount')
+			->from('contra_voucher_entries_details as cv')
+			->join('ledgers','ledgers.id = cv.ledger_id')
+			->join('contra_voucher_entries','contra_voucher_entries.id = cv.voucher_entries_id')
+			->where("cv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('contra_voucher_entries.voucher_date')
+			->group_by('contra_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_contra_statement);
+
+		$statement['ledger_wise_statement'] = $ledger_wise_statement;
+		$statement['ledger_wise_before_date_statement'] = $ledger_wise_before_date_statement;
+        return $statement;
     }
 
+    /*
+     * get account report group wise statement
+     * access public
+     * parameter group id
+     * made by yusuf
+     * ***/
 
+	public function getGroupWiseAccountStatement($start_date,$end_date,$group_id){
+		$ledger_wise_statement = array();
+		$ledger_wise_before_date_statement = array();
+
+		// get ledger ids
+		$this->db->select('id');
+		$this->db->from('ledgers');
+		$this->db->where('group_id',$group_id);
+		$ids = $this->db->get()->result_array();
+		if(!empty($ids)){
+			$ledger_id = array_column($ids,'id');
+		}else{
+			$ledger_id = '';
+		}
+
+		$receive_statement = $this->db->select('receive_voucher_entries.id,
+                                                   receive_voucher_entries.voucher_date,
+                                                   receive_voucher_entries.narration,
+                                                   receive_voucher_entries.voucher_type,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   rv.ledger_id,
+                                                   SUM(rv.debit_amount) as debit_amount,
+                                                   SUM(rv.credit_amount) as credit_amount')
+			->from('receive_voucher_entries_details as rv')
+			->join('ledgers','ledgers.id = rv.ledger_id')
+			->join('receive_voucher_entries','receive_voucher_entries.id = rv.voucher_entries_id')
+			->where_in("rv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+			->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+			->group_by('receive_voucher_entries.voucher_date')
+			->group_by('receive_voucher_entries.id')
+			->get()->result_array();
+
+		array_push($ledger_wise_statement,$receive_statement);
+
+		$before_receive_statement = $this->db->select('receive_voucher_entries.id,
+                                                   receive_voucher_entries.voucher_date,
+                                                   receive_voucher_entries.narration,
+                                                   receive_voucher_entries.voucher_type,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   rv.ledger_id,
+                                                   SUM(rv.debit_amount) as debit_amount,
+                                                   SUM(rv.credit_amount) as credit_amount')
+			->from('receive_voucher_entries_details as rv')
+			->join('ledgers','ledgers.id = rv.ledger_id')
+			->join('receive_voucher_entries','receive_voucher_entries.id = rv.voucher_entries_id')
+			->where_in("rv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('receive_voucher_entries.voucher_date')
+			->group_by('receive_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_receive_statement);
+		$payment_statement = $this->db->select('payment_voucher_entries.id,
+                                                   payment_voucher_entries.voucher_date,
+                                                   payment_voucher_entries.narration,
+                                                   payment_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   pv.ledger_id,
+                                                   SUM(pv.debit_amount)as debit_amount,
+                                                   SUM(pv.credit_amount)as credit_amount ')
+			->from('payment_voucher_entries_details as pv')
+			->join('ledgers','ledgers.id = pv.ledger_id')
+			->join('payment_voucher_entries','payment_voucher_entries.id = pv.voucher_entries_id')
+			->where_in("pv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+			->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+			->group_by('payment_voucher_entries.voucher_date')
+			->group_by('payment_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_statement,$payment_statement);
+		$before_payment_statement = $this->db->select('payment_voucher_entries.id,
+                                                   payment_voucher_entries.voucher_date,
+                                                   payment_voucher_entries.narration,
+                                                   payment_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   pv.ledger_id,
+                                                   SUM(pv.debit_amount)as debit_amount,
+                                                   SUM(pv.credit_amount)as credit_amount ')
+			->from('payment_voucher_entries_details as pv')
+			->join('ledgers','ledgers.id = pv.ledger_id')
+			->join('payment_voucher_entries','payment_voucher_entries.id = pv.voucher_entries_id')
+			->where_in("pv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('payment_voucher_entries.voucher_date')
+			->group_by('payment_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_payment_statement);
+
+		$journal_statement = $this->db->select('journal_voucher_entries.id,
+                                                   journal_voucher_entries.voucher_date,
+                                                   journal_voucher_entries.narration,
+                                                   journal_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   jv.ledger_id,
+                                                   SUM(jv.debit_amount) as debit_amount,
+                                                   SUM(jv.credit_amount) as credit_amount')
+			->from('journal_voucher_entries_details as jv')
+			->join('ledgers','ledgers.id = jv.ledger_id')
+			->join('journal_voucher_entries','journal_voucher_entries.id = jv.voucher_entries_id')
+			->where_in("jv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+			->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+			->group_by('journal_voucher_entries.voucher_date')
+			->group_by('journal_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_statement,$journal_statement);
+
+		$jbefore_ournal_statement = $this->db->select('journal_voucher_entries.id,
+                                                   journal_voucher_entries.voucher_date,
+                                                   journal_voucher_entries.narration,
+                                                   journal_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   jv.ledger_id,
+                                                   SUM(jv.debit_amount) as debit_amount,
+                                                   SUM(jv.credit_amount) as credit_amount')
+			->from('journal_voucher_entries_details as jv')
+			->join('ledgers','ledgers.id = jv.ledger_id')
+			->join('journal_voucher_entries','journal_voucher_entries.id = jv.voucher_entries_id')
+			->where_in("jv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('journal_voucher_entries.voucher_date')
+			->group_by('journal_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$jbefore_ournal_statement);
+
+		$contra_statement = $this->db->select('contra_voucher_entries.id,
+                                                   contra_voucher_entries.voucher_date,
+                                                   contra_voucher_entries.narration,
+                                                   contra_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   cv.ledger_id,
+                                                   SUM(cv.debit_amount) as debit_amount,
+                                                   SUM(cv.credit_amount) as credit_amount')
+			->from('contra_voucher_entries_details as cv')
+			->join('ledgers','ledgers.id = cv.ledger_id')
+			->join('contra_voucher_entries','contra_voucher_entries.id = cv.voucher_entries_id')
+			->where_in("cv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date)
+			->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date)
+			->group_by('contra_voucher_entries.voucher_date')
+			->group_by('contra_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_statement,$contra_statement);
+
+		$before_contra_statement = $this->db->select('contra_voucher_entries.id,
+                                                   contra_voucher_entries.voucher_date,
+                                                   contra_voucher_entries.narration,
+                                                   contra_voucher_entries.voucher_type,
+                                                   ledgers.balance,
+                                                   ledgers.op_balance,
+                                                   ledgers.balance_type,
+                                                   ledgers.ledger_name,
+                                                   cv.ledger_id,
+                                                   SUM(cv.debit_amount) as debit_amount,
+                                                   SUM(cv.credit_amount) as credit_amount')
+			->from('contra_voucher_entries_details as cv')
+			->join('ledgers','ledgers.id = cv.ledger_id')
+			->join('contra_voucher_entries','contra_voucher_entries.id = cv.voucher_entries_id')
+			->where_in("cv.ledger_id", $ledger_id)
+			->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') <", $start_date)
+			->group_by('contra_voucher_entries.voucher_date')
+			->group_by('contra_voucher_entries.id')
+			->get()->result_array();
+		array_push($ledger_wise_before_date_statement,$before_contra_statement);
+
+		$statement['ledger_wise_statement'] = $ledger_wise_statement;
+		$statement['ledger_wise_before_date_statement'] = $ledger_wise_before_date_statement;
+		return $statement;
+	}
+	/**
+	 * Trial Balance Statement
+	 * access public
+	 * return object
+	 * ***/
+
+	public function trialBalanceStatement($post){
+
+		$ledger_wise_statement = array();
+
+		if(!empty($post['start_date']) && !empty($post['end_date'])) {
+//			echo '<pre>';
+			$start_date = date('Y-m-d', strtotime($post['start_date']));
+			$end_date = date('Y-m-d', strtotime($post['end_date']));
+			$this->db->select('ledgers.op_balance,
+							   ledgers.balance_type,
+							   ledgers.ledger_name,
+							   groups.group_name,
+							   rv.ledger_id,
+							   SUM(rv.debit_amount) as debit_amount,
+							   SUM(rv.credit_amount) as credit_amount');
+			$this->db->from('receive_voucher_entries_details as rv');
+			$this->db->join('ledgers', 'ledgers.id = rv.ledger_id');
+			$this->db->join('receive_voucher_entries', 'receive_voucher_entries.id = rv.voucher_entries_id');
+			$this->db->join('groups', 'groups.id = ledgers.group_id');
+			if (!empty($start_date) && !empty($end_date)) {
+				$this->db->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date);
+				$this->db->where("DATE_FORMAT(receive_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date);
+			}
+			$this->db->group_by('rv.ledger_id');
+			$receive_statement = $this->db->get()->result_array();
+			array_push($ledger_wise_statement, $receive_statement);
+
+
+			$this->db->select('ledgers.op_balance,
+							   ledgers.balance_type,
+							   ledgers.ledger_name,
+							   groups.group_name,
+							   SUM(pv.debit_amount)as debit_amount,
+							   SUM(pv.credit_amount)as credit_amount');
+			$this->db->from('payment_voucher_entries_details as pv');
+			$this->db->join('ledgers', 'ledgers.id = pv.ledger_id');
+			$this->db->join('payment_voucher_entries', 'payment_voucher_entries.id = pv.voucher_entries_id');
+			$this->db->join('groups', 'groups.id = ledgers.group_id');
+			if (!empty($start_date) && !empty($end_date)) {
+				$this->db->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date);
+				$this->db->where("DATE_FORMAT(payment_voucher_entries.voucher_date,'%Y-%;m-%d') <=", $end_date);
+			}
+			$this->db->group_by('pv.ledger_id');
+			$payment_statement = $this->db->get()->result_array();
+			array_push($ledger_wise_statement, $payment_statement);
+
+			$this->db->select('ledgers.op_balance,
+							   ledgers.balance_type,
+							   ledgers.ledger_name,
+							   groups.group_name,
+							   jv.ledger_id,
+							   SUM(jv.debit_amount) as debit_amount,
+							   SUM(jv.credit_amount) as credit_amount');
+			$this->db->from('journal_voucher_entries_details as jv');
+			$this->db->join('ledgers', 'ledgers.id = jv.ledger_id');
+			$this->db->join('journal_voucher_entries', 'journal_voucher_entries.id = jv.voucher_entries_id');
+			$this->db->join('groups', 'groups.id = ledgers.group_id');
+			if (!empty($start_date) && !empty($end_date)) {
+				$this->db->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date);
+				$this->db->where("DATE_FORMAT(journal_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date);
+			}
+			$this->db->group_by('jv.ledger_id');
+			$journal_statement = $this->db->get()->result_array();
+			array_push($ledger_wise_statement, $journal_statement);
+
+			$this->db->select('ledgers.op_balance,
+							   ledgers.balance_type,
+							   ledgers.ledger_name,
+							   groups.group_name,
+							   cv.ledger_id,
+							   SUM(cv.debit_amount) as debit_amount,
+							   SUM(cv.credit_amount) as credit_amount');
+			$this->db->from('contra_voucher_entries_details as cv');
+			$this->db->join('ledgers', 'ledgers.id = cv.ledger_id');
+			$this->db->join('contra_voucher_entries', 'contra_voucher_entries.id = cv.voucher_entries_id');
+			$this->db->join('groups', 'groups.id = ledgers.group_id');
+			if (!empty($start_date) && !empty($end_date)) {
+				$this->db->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') >=", $start_date);
+				$this->db->where("DATE_FORMAT(contra_voucher_entries.voucher_date,'%Y-%m-%d') <=", $end_date);
+			}
+			$this->db->group_by('cv.ledger_id');
+			$contra_statement = $this->db->get()->result_array();
+			array_push($ledger_wise_statement, $contra_statement);
+
+			$final_array = call_user_func_array('array_merge', $ledger_wise_statement);
+			$all_ledgers = array_column($final_array,'ledger_id');
+			$ledger_info = array();
+
+			foreach ($all_ledgers as $key=>$val){
+				$debit = 0;
+				$credit = 0;
+				foreach ($final_array as $v){
+					if($val == $v['ledger_id']){
+						$debit += (int) $v['debit_amount'];
+						$credit += (int) $v['credit_amount'];
+					}
+				}
+				$v['debit'] = $debit;
+				$v['credit'] = $credit;
+
+				array_push($ledger_info,$v);
+
+			}
+//			print_r($all_ledgers);
+//			print_r($ledger_info);
+//			print_r(call_user_func_array('array_merge', $ledger_wise_statement));
+
+			$data['trial_balance_statement'] = $ledger_info;
+		}else{
+			$this->db->select('groups.group_name,
+								ledgers.ledger_name,
+								ledgers.op_balance,
+								ledgers.balance_type,
+								ledgers.debit,
+								ledgers.credit');
+			$this->db->from('ledgers');
+			$this->db->join('groups','groups.id = ledgers.group_id');
+			$result = $this->db->get()->result_array();
+
+			$data['trial_balance_statement'] = $result;
+		}
+		return $data;
+	}
+	/**
+	 * Trial Balance Statement
+	 * access public
+	 * return object
+	 * ***/
+
+	public function balanceStatement(){
+		$this->db->select('ledger_name,
+							op_balance,
+							debit,
+							credit');
+		$this->db->from('ledgers');
+		return $this->db->get()->result_array();
+	}
 }

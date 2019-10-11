@@ -21,24 +21,16 @@
         <link href="<?= site_url(); ?>assets/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
         <!-- select 2 css -->
         <link href="<?= site_url(); ?>assets/vendors/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css"/>
-        <!-- NProgress -->
-        <link href="<?= site_url(); ?>assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+
         <!-- jQuery -->
         <script src="<?= site_url(); ?>assets/vendors/jquery/dist/jquery.min.js"></script>
-<!--        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
 
         <!-- Datatables -->
-        <link href="<?= site_url(); ?>assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-        <link href="<?= site_url(); ?>assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-        <link href="<?= site_url(); ?>assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-        <link href="<?= site_url(); ?>assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-        <link href="<?= site_url(); ?>assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<?= site_url(); ?>assets/vendors/datatble/jqueryy.dataTables.min.css">
+		<link rel="stylesheet" type="text/css" href="<?= site_url(); ?>assets/vendors/datatble/buttons.dataTables.min.css">
 
         <!-- bootstrap-datetimepicker -->
         <link href="<?= site_url(); ?>assets/vendors/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css" rel="stylesheet">
-
-        <!-- bootstrap-daterangepicker -->
-        <link href="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
         <!-- Custom styling plugins -->
         <link href="<?= site_url(); ?>assets/build/css/custom.css" rel="stylesheet">
@@ -248,8 +240,9 @@
 
                 <!-- footer content -->
                 <footer>
+					<div style="bottom: 0; left: 0; position: fixed; right: 0; width: 0px; top: 220px; margin-left: auto; height: auto; margin-right: auto; margin-top: auto; margin-bottom: auto; display: none" class="loadingImage"><img src="<?php echo base_url().'assets/images/loader.gif'; ?>"></div>
                     <div class="pull-right">
-                        Developed by <a href="http://firstitsolution.com/">Firstit Solution</a>
+                        Developed by <a href="http://firstitsolution.com/" target="_blank">First IT Solution</a>
                     </div>
                     <div class="clearfix"></div>
                 </footer>
@@ -361,11 +354,6 @@
         <!---Form wizard jquery file -->
         <script src="<?= site_url(); ?>assets/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
 
-        <!-- FastClick -->
-        <script src="<?= site_url(); ?>assets/vendors/fastclick/lib/fastclick.js"></script>
-        <!-- NProgress -->
-        <script src="<?= site_url(); ?>assets/vendors/nprogress/nprogress.js"></script>
-
         <!-- bootstrap-daterangepicker -->
         <script src="<?= site_url(); ?>assets/vendors/moment/min/moment.min.js"></script>
         <script src="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script> 
@@ -375,28 +363,20 @@
 
         <!-- bootstrap-daterangepicker -->
         <script src="<?= site_url(); ?>assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-        <!-- Datatables -->
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/jszip/dist/jszip.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/pdfmake/build/pdfmake.min.js"></script>
-        <script src="<?= site_url(); ?>assets/vendors/pdfmake/build/vfs_fonts.js"></script>
+
+		<!-- Datatables -->
+		<script src="<?= site_url(); ?>assets/vendors/datatble/jquery.dataTables.min.js"></script>
+		<script src="<?= site_url(); ?>assets/vendors/datatble/dataTables.buttons.min.js"></script>
+		<script src="<?= site_url(); ?>assets/vendors/datatble/buttons.html5.min.js"></script>
+		<script src="<?= site_url(); ?>assets/vendors/datatble/buttons.print.min.js"></script>
 
         <!-- iCheck -->
         <script src="<?= site_url(); ?>assets/vendors/iCheck/icheck.min.js"></script>
-        <!-- Select2 js -->
+
+		<!-- Select2 js -->
         <script src="<?= site_url(); ?>assets/vendors/select2/dist/js/select2.js" type="text/javascript"></script>
-        <!-- Custom Theme Scripts -->
+
+		<!-- Custom Theme Scripts -->
         <script src="<?= site_url(); ?>assets/build/js/custom.js"></script>
         <script src="<?= site_url(); ?>assets/build/js/custom.noyon.js" type="text/javascript"></script>   
 
@@ -404,8 +384,8 @@
             $(document).ready(function () {
 
                 $('.dateinput').datetimepicker({
-                    format: 'DD-MM-YYYY',
-                    defaultDate:new Date(),                    
+					format: 'DD-MM-YYYY',
+					defaultDate:new Date()
                 });
 
             });

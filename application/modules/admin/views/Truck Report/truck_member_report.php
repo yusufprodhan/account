@@ -1,6 +1,3 @@
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
-
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
@@ -66,26 +63,8 @@
         </div>
     </div>
 </div>
-<!--<script src="https://code.jquery.com/jquery-3.3.1.js"></script>-->
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function() {
-//        $('#datatable_ex').DataTable( {
-//            dom: 'Bfrtip',
-//            "lengthChange": true,
-//            "pageLength":50,
-//            "ordering" : true,
-//            buttons: [
-//                'copy', 'csv', 'excel', 'pdf', 'print'
-//            ]
-//        });
         $(document).find('.datatable_ex').DataTable({
             dom: 'Bfrtip',
 //          "pageLength":50,
@@ -93,7 +72,7 @@
             "bDestroy": true,
             "bPaginate":true,
 //            "iDisplayLength": 25,
-            "lengthMenu": [[25, 50, 100, 500, -1], [25, 50, 100, 500, "All"]],
+            "lengthMenu": [[10,25, 50, 100, 500, -1], [10,25, 50, 100, 500, "All"]],
             buttons: [
                 {
                     extend: 'csv',

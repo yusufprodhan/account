@@ -79,5 +79,30 @@
     $(document).ready(function () {
         $('.alert-success').delay(1000).hide(300);
         $('.alert-danger').delay(1000).hide(300);
+
+		//data table
+		$(document).find('#datatable').DataTable({
+			dom: 'Bfrtip',
+			"bRetrieve": true,
+			"bDestroy": true,
+			"bPaginate":true,
+			"lengthMenu": [[10,25, 50, 100, 500, -1], [10,25, 50, 100, 500, "All"]],
+			buttons: [
+				{
+					extend: 'csv',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'print',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'pageLength',
+					footer: true
+				}
+			],
+		});
     })
 </script>

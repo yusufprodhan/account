@@ -288,12 +288,37 @@
         
         $('.alert-success').delay(2000).hide(300).css({'color': 'green'});
         $('.alert-danger').delay(2000).hide(300).css({'color': '#fff'});
+
+		//data table
+        $(document).find('#datatable').DataTable({
+			dom: 'Bfrtip',
+			"bRetrieve": true,
+			"bDestroy": true,
+			"bPaginate":true,
+			"lengthMenu": [[10,25, 50, 100, 500, -1], [10,25, 50, 100, 500, "All"]],
+			buttons: [
+				{
+					extend: 'csv',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'print',
+					footer: true,
+					filename: 'Truck Statement Report Memberwise'
+				},
+				{
+					extend: 'pageLength',
+					footer: true
+				}
+			],
+		});
     });
 
     //edit member
     $(document).on("click", "#edit_member", function(){
         var member_edit_id = $(this).attr('edit_member');
-        // console.log(member_edit_id);
+
         $.ajax({
             url: "<?= site_url('/admin/getMemberDataOnEdit/'); ?>",
             type: 'post',

@@ -32,14 +32,14 @@
 							</div>
 							<div class="col-md-3 col-sm-12">
 								<div class="form-group">
-									<label for="ledger_name">Ledger</label>
+									<label for="ledger_name">Group</label>
 									<br/>
 									<select class="form-control" name="ledger_name" id="ledger_name">
-										<option>Select Ledger</option>
-										<?php if(!empty($all_ledger)){
-											foreach ($all_ledger as $ledger){
+										<option>Select Group</option>
+										<?php if(!empty($all_groups)){
+											foreach ($all_groups as $group){
 												?>
-												<option value="<?php echo $ledger['id']?>"><?php echo $ledger['ledger_name']?></option>
+												<option value="<?php echo $group['id']?>"><?php echo $group['group_name']?></option>
 											<?php }}?>
 									</select>
 								</div>

@@ -247,8 +247,12 @@
 				url: "<?= site_url('/admin/getDebitLedgerBalance/'); ?>",
 				type: 'post',
 				data: {ledger_id: ledger_id},
+				beforeSend: function(){
+					$('.loadingImage').show();
+				},
 				success: function (data) {
 					$(current).parent().parent().find('.current_balance').html(data);
+					$('.loadingImage').hide();
 				}
 			});
 		}else{
@@ -270,9 +274,13 @@
 			url: "<?= site_url('/admin/getAllChequeNumber/'); ?>",
 			type: 'post',
 			data: {cheque_book_number: cheque_book_number},
+			beforeSend: function(){
+				$('.loadingImage').show();
+			},
 			success: function (data) {
 				$('#cheque_number').html(data);
-			}
+				$('.loadingImage').hide();
+			},
 		});
 
 		//for bank name
@@ -280,8 +288,12 @@
 			url: "<?= site_url('/admin/getBankNameONChequeNumber/'); ?>",
 			type: 'post',
 			data: {cheque_book_number: cheque_book_number},
+			beforeSend: function(){
+				$('.loadingImage').show();
+			},
 			success: function (data) {
 				$('#bank_name').html(data);
+				$('.loadingImage').hide();
 			}
 		});
 	});
